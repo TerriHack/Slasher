@@ -24,7 +24,6 @@ public class PlayerInputHandler : MonoBehaviour
     private InputAction stabAction;
     
     public Vector2 MoveInput { get; private set; }
-    public bool kickInput { get; private set; }
     public float SprintValue { get; private set; }
     public bool stabInput { get; private set; }
     
@@ -32,6 +31,8 @@ public class PlayerInputHandler : MonoBehaviour
 
     [Foldout("Events")]
     public UnityEvent onKick;
+    [Foldout("Events")]
+    public UnityEvent onStab;
 
     private void Awake()
     {
@@ -62,6 +63,7 @@ public class PlayerInputHandler : MonoBehaviour
         sprintAction.performed += context => SprintValue = context.ReadValue<float>();
         sprintAction.canceled += context => SprintValue = 0f;
         
+        stabAction.started += context => onStab.Invoke();
         stabAction.performed += context => stabInput = true;
         stabAction.canceled += context => stabInput = false;
     }
