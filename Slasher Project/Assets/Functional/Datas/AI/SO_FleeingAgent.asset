@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SO_FleeingAgent
   moveSpeed: 10
   acceleration: 6
+  steering: 10
   timeToCombo: 0.5
   minMaxBravery: {x: 10, y: 80}

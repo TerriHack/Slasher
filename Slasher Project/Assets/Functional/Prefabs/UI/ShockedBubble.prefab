@@ -28,7 +28,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0.0071412018, w: 0.9999745}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1426467871560804329}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -0.818}
@@ -164,15 +164,15 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: 0.07797938, w: -0.99695504}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5347999842614275103}
   m_Father: {fileID: 287584834449495264}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -8.945}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 20}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 35.3, y: 23.5}
-  m_SizeDelta: {x: 47.8792, y: 39.1572}
+  m_SizeDelta: {x: 47, y: 47}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4846701965422060593
 CanvasRenderer:
@@ -223,6 +223,7 @@ GameObject:
   - component: {fileID: 287584834449495264}
   - component: {fileID: 7015325338443080922}
   - component: {fileID: 1893647063491509471}
+  - component: {fileID: -2105411258532146306}
   m_Layer: 0
   m_Name: ShockedBubble
   m_TagString: Untagged
@@ -270,3 +271,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c76307ea629062745bdf14be87ca4c0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShockedBubble
+  startAnimation: {fileID: -2105411258532146306}
+--- !u!111 &-2105411258532146306
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7094293645462101044}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 7400000, guid: 325f965db49f6a340bb3a3cb2df823a3, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 325f965db49f6a340bb3a3cb2df823a3, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0

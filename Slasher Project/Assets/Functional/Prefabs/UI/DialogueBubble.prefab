@@ -28,7 +28,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1426467871560804329}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -164,7 +164,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5347999842614275103}
   m_Father: {fileID: 287584834449495264}
@@ -223,6 +223,7 @@ GameObject:
   - component: {fileID: 287584834449495264}
   - component: {fileID: 7015325338443080922}
   - component: {fileID: 7967862849889277350}
+  - component: {fileID: -3912537549279613802}
   m_Layer: 0
   m_Name: DialogueBubble
   m_TagString: Untagged
@@ -270,6 +271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97e59bbb1d8c75849bf01ebb2b87aff0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueBubble
+  startAnimation: {fileID: -3912537549279613802}
   bubbleImage: {fileID: 8685783935292290671}
   bubbleText: {fileID: 6311017925579181348}
   bubbleSprites: []
@@ -286,3 +288,20 @@ MonoBehaviour:
   fleeDialogues: []
   attackDialogues: []
   isHeGoneDialogues: []
+--- !u!111 &-3912537549279613802
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7094293645462101044}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 7400000, guid: 705f41f20a6c06443867b15996c48552, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 705f41f20a6c06443867b15996c48552, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0

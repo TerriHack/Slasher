@@ -376,6 +376,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AiVctime
   baseData: {fileID: 11400000, guid: 969e58dd0fab3b24897e015338ae02b7, type: 2}
   fleeData: {fileID: 11400000, guid: cc2f71165f2a3404085454d24571ee3a, type: 2}
+  bloodSplatter: {fileID: 1641838156190285445, guid: 0b62b07ed7d6caf45b5dcb2e24f0952b, type: 3}
 --- !u!135 &4392358506202580875
 SphereCollider:
   m_ObjectHideFlags: 0
