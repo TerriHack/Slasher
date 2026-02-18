@@ -5,6 +5,7 @@ public class SO_PhaseZeroAgent : ScriptableObject
 {
     [Header("Movement")]
     public float moveSpeed;
+    public float acceleration;
 
     [Header("Phase 0")] 
     public float talkProbability;

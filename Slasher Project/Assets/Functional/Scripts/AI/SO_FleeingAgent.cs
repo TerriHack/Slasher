@@ -5,6 +5,7 @@ public class SO_FleeingAgent : ScriptableObject
 {
     [Header("Movement")]
     public float moveSpeed;
+    public float acceleration;
 
     [Header("Damage")] 
     public float timeToCombo;

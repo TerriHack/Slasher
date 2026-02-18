@@ -6,17 +6,16 @@ public class DialogueManager : MonoBehaviour
     public static DialogueManager Instance;
 
     [SerializeField] private Canvas canvas;
-    [SerializeField] private GameObject dialogueBubble;
 
     [SerializeField] private float bubbleDuration;
-    [SerializeField] private float bubbleCooldown;
     private float cooldownTimer;
 
-    [SerializeField] private List<Sprite> bubbleSprites;
-    [SerializeField] private List<string> phaseZeroDialogues;
-    [SerializeField] private List<string> fleeDialogues;
-    [SerializeField] private List<string> attackDialogues;
-    [SerializeField] private List<string> isHeGoneDialogues;
+    [Header("Dialogues")]
+    [SerializeField] private GameObject dialogueBubble;
+    [SerializeField] private float dialogueBubbleCooldown;
+    
+    [Header("Shocked")]
+    [SerializeField] private GameObject shockedBubble;
 
     void Awake()
     {
@@ -42,36 +41,25 @@ public class DialogueManager : MonoBehaviour
         var targetScreenPos = Camera.main.WorldToScreenPoint(ai.transform.position);
         
         var bubble = Instantiate(dialogueBubble, targetScreenPos, Quaternion.identity, canvas.transform);
-
-        var r = 0;
-        var text = "";
         
-        switch (typeOfDialogue)
-        {
-            case 0:
-                r = Random.Range(0, phaseZeroDialogues.Count);
-                text = phaseZeroDialogues[r];
-                break;
-            case 1:
-                r = Random.Range(0, fleeDialogues.Count);
-                text = fleeDialogues[r];
-                break;
-            case 2:
-                r = Random.Range(0, attackDialogues.Count);
-                text = attackDialogues[r];
-                break;
-            case 3:
-                r = Random.Range(0, isHeGoneDialogues.Count);
-                text = isHeGoneDialogues[r];
-                break;
-        }
-        
-        bubble.GetComponent<DialogueBubble>().InitBubble(bubbleSprites[typeOfDialogue], text, ai);
+        bubble.GetComponent<DialogueBubble>().InitBubble(ai);
+        bubble.GetComponent<DialogueBubble>().InitSpriteAndText(typeOfDialogue);
 
-        cooldownTimer = bubbleCooldown;
+        cooldownTimer = dialogueBubbleCooldown;
 
         Destroy(bubble, bubbleDuration);
         
         return true;
+    }
+
+    public void SpawnShockedBubble(GameObject ai)
+    {
+        var targetScreenPos = Camera.main.WorldToScreenPoint(ai.transform.position);
+        
+        var bubble = Instantiate(shockedBubble, targetScreenPos, Quaternion.identity, canvas.transform);
+        
+        bubble.GetComponent<ShockedBubble>().InitBubble(ai);
+        
+        Destroy(bubble, bubbleDuration);
     }
 }
