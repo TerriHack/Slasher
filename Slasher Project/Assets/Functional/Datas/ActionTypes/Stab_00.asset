@@ -12,3 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35531cc97c0914141b308b7f7d822a2e, type: 3}
   m_Name: Stab_00
   m_EditorClassIdentifier: Assembly-CSharp::StabSo
+  <DurationBeforeReset>k__BackingField: 0.2
+  <StabCombo>k__BackingField:
+  - {fileID: 11400000, guid: 5d39e6949119bd54998dc0835a3473f2, type: 2}
+  - {fileID: 11400000, guid: ecbe6fe9b0f3f8042b574eb84e735dad, type: 2}
+  - {fileID: 11400000, guid: ec71fe1718009be43b6ab88953ea0bc5, type: 2}

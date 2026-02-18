@@ -15,5 +15,5 @@ MonoBehaviour:
   playerActions:
   - {fileID: 11400000, guid: ffa8f578e0c7da24ca854603dcc95bfe, type: 2}
   - {fileID: 11400000, guid: e33355ef77d141a48b0c516fdd2e01c0, type: 2}
-  - {fileID: 11400000, guid: cdf6d8fe83af25b41be965ff768f527a, type: 2}
   - {fileID: 11400000, guid: 886b9b1a00703ff42a07097935cfec79, type: 2}
+  - {fileID: 11400000, guid: cdf6d8fe83af25b41be965ff768f527a, type: 2}

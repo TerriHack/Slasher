@@ -43,7 +43,7 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 321836231112206218}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
+  m_Avatar: {fileID: 9000000, guid: 64d6593d3b4a38e45a7b50b9cc6f872e, type: 3}
   m_Controller: {fileID: 9100000, guid: ee3059329d8ce03459d0c4c938c9fcfb, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
@@ -750,6 +750,66 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  onStartSprinting:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7877104171207133233}
+        m_TargetAssemblyTypeName: PlayerFeedbackBehavior, Assembly-CSharp
+        m_MethodName: ActivateSprinting
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onStopSprinting:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7877104171207133233}
+        m_TargetAssemblyTypeName: PlayerFeedbackBehavior, Assembly-CSharp
+        m_MethodName: DeactivateSprinting
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onStabbing:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7877104171207133233}
+        m_TargetAssemblyTypeName: PlayerFeedbackBehavior, Assembly-CSharp
+        m_MethodName: ActivateStab
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onStopStabbing:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7877104171207133233}
+        m_TargetAssemblyTypeName: PlayerFeedbackBehavior, Assembly-CSharp
+        m_MethodName: DeactivateStab
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   currentPlayerState: 0
 --- !u!114 &7877104171207133233
 MonoBehaviour:
@@ -784,9 +844,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 2
+  m_Height: 3
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.6, z: 0}
 --- !u!54 &9037785568719551913
 Rigidbody:
   m_ObjectHideFlags: 0
