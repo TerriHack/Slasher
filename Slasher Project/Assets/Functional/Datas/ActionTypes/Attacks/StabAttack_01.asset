@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: StabAttack_01
   m_EditorClassIdentifier: Assembly-CSharp::StabAttackSo
   <AttackDuration>k__BackingField: 0.4
+  collisionBox: {fileID: 9083483817125134914, guid: 4778bebd747dd2a4595899e3e3c5775b, type: 3}

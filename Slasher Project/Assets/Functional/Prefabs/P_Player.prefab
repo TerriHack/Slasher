@@ -701,6 +701,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3635077368364356361}
+  - {fileID: 7455594659846731744}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &9189604466854523935
@@ -715,7 +716,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18a08d100f58d3e419bd73da13d58960, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  _playerPresetSo: {fileID: 0}
+  playerPresetSo: {fileID: 11400000, guid: 3d05d9d7ea1212140a2b662cd8a3b332, type: 2}
+  collisionBoxParent: {fileID: 7455594659846731744}
   _canMove: 0
   _canStab: 0
   _canSprint: 0
@@ -811,6 +813,10 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   currentPlayerState: 0
+  currentStabAttackIndex: 0
+  _stabAttack0Launched: 0
+  _stabAttack1Launched: 0
+  _stabAttack2Launched: 0
 --- !u!114 &7877104171207133233
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1772,6 +1778,37 @@ Transform:
   m_Children:
   - {fileID: 2637137063546961094}
   m_Father: {fileID: 8801729484216151347}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5123299306658690348
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7455594659846731744}
+  m_Layer: 0
+  m_Name: AttackCollisionBoxes
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7455594659846731744
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5123299306658690348}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 1.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7383724975646473336}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5274089165032720228
 GameObject:

@@ -796,18 +796,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 9189604466854523935, guid: 9def5b47b7dbde94aa27f0d3e05899f2, type: 3}
-      propertyPath: _canKick
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9189604466854523935, guid: 9def5b47b7dbde94aa27f0d3e05899f2, type: 3}
-      propertyPath: _canSprint
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9189604466854523935, guid: 9def5b47b7dbde94aa27f0d3e05899f2, type: 3}
-      propertyPath: _playerPresetSo
-      value: 
-      objectReference: {fileID: 11400000, guid: 3d05d9d7ea1212140a2b662cd8a3b332, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

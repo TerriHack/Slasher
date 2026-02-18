@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NaughtyAttributes;
 using Unity.Mathematics;
 using UnityEngine;
@@ -11,7 +12,8 @@ public class PlayerController : MonoBehaviour
     
     private PlayerInputHandler _inputHandler;
 
-    [SerializeField] private PlayerPresetSo _playerPresetSo;
+    [SerializeField] private PlayerPresetSo playerPresetSo;
+    [SerializeField] private Transform collisionBoxParent;
 
     [field: SerializeField, ReadOnly, BoxGroup("Player Actions")]
     private bool _canMove;
@@ -39,6 +41,8 @@ public class PlayerController : MonoBehaviour
     private StabSo _stabSo;
     private SprintSo _sprintSo;
     private KickSo _kickSo;
+
+    private List<GameObject> stabAttackCollisionBoxes;
     
     private enum PlayerState
     {
@@ -54,13 +58,15 @@ public class PlayerController : MonoBehaviour
 
     private bool _isSprinting;
     private float _sprintValue;
-
-    public int StabComboIndex {get; private set;}
+    
     private bool _isStabbing;
+    private bool _canAttack = true;
     private float _stabCountdown;
-    private int _targetComboIndex;
-    private bool _stabComboHasIncremented;
-    private bool _attackCanFollowUp;
+    public int currentStabAttackIndex;
+    public bool _stabAttack0Launched;
+    public bool _stabAttack1Launched;
+    public bool _stabAttack2Launched;
+    
     
     private void Awake()
     {
@@ -72,7 +78,7 @@ public class PlayerController : MonoBehaviour
     {
         _inputHandler = PlayerInputHandler.Instance;
 
-        RegisterNewPlayerActions(_playerPresetSo);
+        RegisterNewPlayerActions(playerPresetSo);
     }
     private void FixedUpdate()
     {
@@ -87,9 +93,7 @@ public class PlayerController : MonoBehaviour
         MovementValueCalculation();
         SprintValueCalculation();
         
-        StabCooldown();
-        
-        Debug.Log(StabComboIndex);
+        ManageStabCooldown();
     }
 
     public void RegisterNewPlayerActions(PlayerPresetSo newPlayerActions)
@@ -101,6 +105,7 @@ public class PlayerController : MonoBehaviour
                 case StabSo:
                     _canStab = true;
                     _stabSo = (StabSo)newPlayerActions.playerActions[i];
+                    InitializeNewStabCollisionBoxes();
                     break;
                 case MoveSo:
                     _canMove = true;
@@ -120,7 +125,7 @@ public class PlayerController : MonoBehaviour
         }
 
         //Sets the new player preset
-        _playerPresetSo = newPlayerActions;
+        playerPresetSo = newPlayerActions;
     }
 
     private void GetLastDirection()
@@ -201,45 +206,98 @@ public class PlayerController : MonoBehaviour
 
     public void Stab()
     {
-        if (!_canStab) return;
+        if(!_canStab) return;
 
-        if (StabComboIndex == 0)
+        if (!_stabAttack0Launched && _canAttack)
         {
+            _stabAttack0Launched = true;
+            currentStabAttackIndex = 0;
+            StartStabCooldown();
+            ManageStabCollisionBoxes(true,currentStabAttackIndex);
             onStabbing.Invoke();
-            _isStabbing = true;
-            _stabCountdown = 0f;
-            StabComboIndex++;
+            
             return;
         }
-
-        if (_attackCanFollowUp)
+        if (!_stabAttack1Launched && _canAttack)
         {
+            _stabAttack1Launched = true;
+            currentStabAttackIndex = 1;
+            StartStabCooldown();
+            ManageStabCollisionBoxes(true,currentStabAttackIndex);
             onStabbing.Invoke();
-            StabComboIndex++;
-            StabComboIndex = Mathf.Clamp(StabComboIndex,0,_stabSo.StabCombo.Length - 1);
-            _isStabbing = true;
-            _stabCountdown = 0f;
-            _attackCanFollowUp = false;
+            return;
         }
+        if (!_stabAttack2Launched && _canAttack)
+        {
+            _stabAttack2Launched = true;
+            currentStabAttackIndex = 2;
+            StartStabCooldown();
+            ManageStabCollisionBoxes(true,currentStabAttackIndex);
+            onStabbing.Invoke();
+            return;
+        }
+        
+        ResetStabAttack();
+        ResetStabCooldown();
     }
 
-    private void StabCooldown()
+    private void ResetStabAttack()
+    {
+        _stabAttack0Launched = false;
+        _stabAttack1Launched = false;
+        _stabAttack2Launched = false;
+    }
+
+    private void StartStabCooldown()
+    {
+        _isStabbing = true;
+        _stabCountdown = 0f;
+    }
+    private void ResetStabCooldown()
+    {
+        _isStabbing = false;
+        _stabCountdown = 0f;
+    }
+    private void ManageStabCooldown()
     {
         if(!_isStabbing) return;
         _stabCountdown += Time.fixedDeltaTime;
-        
-        if (_stabCountdown >= _stabSo.StabCombo[StabComboIndex].AttackDuration)
+
+        if (_stabCountdown >= _stabSo.StabCombo[currentStabAttackIndex].AttackDuration)
         {
-            _attackCanFollowUp = true;
+            _canAttack = true;
+            ManageStabCollisionBoxes(false,currentStabAttackIndex);
+        }
+        else
+        {
+            _canAttack = false;
         }
         
-        if (_stabCountdown >= _stabSo.StabCombo[StabComboIndex].AttackDuration + _stabSo.DurationBeforeReset)
+        if (_stabCountdown >= _stabSo.StabCombo[currentStabAttackIndex].AttackDuration + _stabSo.DurationBeforeReset)
         {
-            _isStabbing = false;
-            _attackCanFollowUp = false;
-            _stabCountdown = 0f;
-            StabComboIndex = 0;
+            _canAttack = true;
+            ResetStabCooldown(); 
+            ResetStabAttack();
             onStopStabbing.Invoke();
         }
+    }
+    
+    
+    private void InitializeNewStabCollisionBoxes()
+    {
+        if(!_canStab) return;
+        stabAttackCollisionBoxes = new List<GameObject>();
+        foreach (var t in _stabSo.StabCombo)
+        {
+            Debug.Log(t);
+            GameObject box = Instantiate(t.collisionBox, collisionBoxParent);
+            stabAttackCollisionBoxes.Add(box);
+            box.SetActive(false);
+        }
+    }
+
+    private void ManageStabCollisionBoxes(bool active, int boxIndex)
+    {
+        stabAttackCollisionBoxes[boxIndex].SetActive(active);
     }
 }
