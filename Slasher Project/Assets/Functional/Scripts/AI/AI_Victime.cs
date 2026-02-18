@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Rendering.Universal;
 using Random = UnityEngine.Random;
 
 public class AiVictime : MonoBehaviour
@@ -20,6 +21,7 @@ public class AiVictime : MonoBehaviour
     private Vector2 minMaxDelayBeforeMoving;
     private float delayBeforeFleeing;
     private float maxMoveRange;
+    private float steering;
 
     private float timerBeforeMoving;
     private Vector3 startPos;
@@ -32,7 +34,13 @@ public class AiVictime : MonoBehaviour
     private float damageTimer;
     private bool hasTakenDamage;
 
+    private bool isFleeing;
+    private float fleeRecalculationCooldown = 2f;
+    private float fleeRecalculationTimer;
+
     private GameObject player;
+
+    [SerializeField] private GameObject bloodSplatter;
     
     #region Init
     private void Start()
@@ -75,6 +83,7 @@ public class AiVictime : MonoBehaviour
         moveSpeedRun = fleeData.moveSpeed;
         bravery = Random.Range(fleeData.minMaxBravery.x, fleeData.minMaxBravery.y);
         timeToCombo = fleeData.timeToCombo;
+        steering = fleeData.steering;
     }
 
     private void InitTimers()
@@ -88,6 +97,7 @@ public class AiVictime : MonoBehaviour
     {
         PhaseZeroCheckToMove();
         CheckDeathFromDamage();
+        Flee();
     }
 
     #region Phase Zero
@@ -176,6 +186,10 @@ public class AiVictime : MonoBehaviour
     private void DieFeedbacks()
     {
         transform.LookAt(transform.position + Vector3.up * -5);
+        
+        var blood = Instantiate(bloodSplatter, transform.position + Vector3.down, transform.rotation);
+        blood.GetComponent<DecalProjector>().size = Random.Range(0.8f, 4f) * Vector3.one;
+        blood.transform.RotateAround(Vector3.up, Random.Range(0, 360));
     }
 
     private void DisableThatScript()
@@ -202,16 +216,60 @@ public class AiVictime : MonoBehaviour
         transform.LookAt(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z));
         DialogueManager.Instance.SpawnShockedBubble(gameObject);
         
-        StartCoroutine(Flee());
+        StartCoroutine(WaitBeforeFlee());
     }
 
-    private IEnumerator Flee()
+    private IEnumerator WaitBeforeFlee()
     {
         yield return new WaitForSeconds(delayBeforeFleeing);
         agent.enabled = true;
         agent.acceleration = fleeData.acceleration;
         agent.speed = moveSpeedRun;
-        agent.SetDestination(transform.position + (transform.position - player.transform.position).normalized * 10f);
+        isFleeing = true;
+    }
+
+    private void Flee()
+    {
+        if(!isFleeing) return;
+
+        if (fleeRecalculationTimer > 0)
+        {
+            fleeRecalculationTimer -= Time.deltaTime;
+            return;
+        }
+        
+        fleeRecalculationTimer = fleeRecalculationCooldown;
+        
+        Vector3 awayFromPlayer = (transform.position - player.transform.position).normalized;
+
+        float fleeDistance = 20f;
+        float coneAngle = 360f;
+        int tries = 100;
+
+        float bestDistance = 0;
+
+        Vector3 bestPlaceToFlee = transform.position;
+
+        for (int i = 0; i < tries; i++)
+        {
+            float angle = Random.Range(-coneAngle * 0.5f, coneAngle * 0.5f);
+            Vector3 newDirection = Quaternion.AngleAxis(angle, Vector3.up) * awayFromPlayer;
+
+            Vector3 spotToCheck = transform.position + newDirection * fleeDistance;
+
+            if (NavMesh.SamplePosition(spotToCheck, out NavMeshHit hit, 10f, NavMesh.AllAreas))
+            {
+                float distanceToPlayer = Vector3.Distance(hit.position, player.transform.position);
+                
+                if (distanceToPlayer > bestDistance)
+                {
+                    bestDistance = distanceToPlayer;
+                    bestPlaceToFlee = hit.position;
+                }
+            }
+        }
+        
+        agent.SetDestination(bestPlaceToFlee);
     }
     
     #endregion
