@@ -24,13 +24,7 @@ public class PlayerFeedbackBehavior : MonoBehaviour
     public void ActivateStab()
     {
         _animator.SetLayerWeight(1,1);
-        _animator.SetBool("isStabbing",true);
-        _animator.SetInteger("stabComboIndex",PlayerController.Instance.currentStabAttackIndex);
-    }
-    
-    public void DeactivateStab()
-    {
-        _animator.SetLayerWeight(1,0);
-        _animator.SetBool("isStabbing",false);
+        _animator.runtimeAnimatorController = PlayerController.Instance.Combo[PlayerController.Instance.ComboCounter].AttackAnimatorOverride;
+        _animator.Play("Attack",1,0);
     }
 }
