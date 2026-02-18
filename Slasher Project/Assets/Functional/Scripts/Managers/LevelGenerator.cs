@@ -45,6 +45,12 @@ public class LevelGenerator : MonoBehaviour
                 if((i + j)%2 == 0) continue;
                     
                 var spawner = Instantiate(doorSpawner, new Vector3(i * x, 3, j * y), Quaternion.identity, transform);
+
+                if (i == -1 || i == 1)
+                {
+                    spawner.transform.eulerAngles = new Vector3(0, 90, 0);
+                }
+                
                 PlaceSpawnerInCluster(spawner, new Vector2(i,j));
             }
         }
@@ -61,32 +67,32 @@ public class LevelGenerator : MonoBehaviour
 
         for (int i = 0; i < clusterDoors1.Count; i++)
         {
-            if(i == r1) Instantiate(baseDoorClose, clusterDoors1[i].transform.position, Quaternion.identity, transform);
-            else Instantiate(baseDoorOpen, clusterDoors1[i].transform.position, Quaternion.identity, transform);
+            if(i == r1) Instantiate(baseDoorClose, clusterDoors1[i].transform.position, clusterDoors1[i].transform.rotation, transform);
+            else Instantiate(baseDoorOpen, clusterDoors1[i].transform.position, clusterDoors1[i].transform.rotation, transform);
         }
         
         // Cluster 2
 
         for (int i = 0; i < clusterDoors2.Count; i++)
         {
-            if(i == r2) Instantiate(baseDoorClose, clusterDoors2[i].transform.position, Quaternion.identity, transform);
-            else Instantiate(baseDoorOpen, clusterDoors2[i].transform.position, Quaternion.identity, transform);
+            if(i == r2) Instantiate(baseDoorClose, clusterDoors2[i].transform.position, clusterDoors2[i].transform.rotation, transform);
+            else Instantiate(baseDoorOpen, clusterDoors2[i].transform.position, clusterDoors2[i].transform.rotation, transform);
         }
         
         // Cluster 3
 
         for (int i = 0; i < clusterDoors3.Count; i++)
         {
-            if(i == r3) Instantiate(baseDoorClose, clusterDoors3[i].transform.position, Quaternion.identity, transform);
-            else Instantiate(baseDoorOpen, clusterDoors3[i].transform.position, Quaternion.identity, transform);
+            if(i == r3) Instantiate(baseDoorClose, clusterDoors3[i].transform.position, clusterDoors3[i].transform.rotation, transform);
+            else Instantiate(baseDoorOpen, clusterDoors3[i].transform.position, clusterDoors3[i].transform.rotation, transform);
         }
         
         // Cluster 4
 
         for (int i = 0; i < clusterDoors4.Count; i++)
         {
-            if(i == r4) Instantiate(baseDoorClose, clusterDoors4[i].transform.position, Quaternion.identity, transform);
-            else Instantiate(baseDoorOpen, clusterDoors4[i].transform.position, Quaternion.identity, transform);
+            if(i == r4) Instantiate(baseDoorClose, clusterDoors4[i].transform.position, clusterDoors4[i].transform.rotation, transform);
+            else Instantiate(baseDoorOpen, clusterDoors4[i].transform.position, clusterDoors4[i].transform.rotation, transform);
         }
         
     }
