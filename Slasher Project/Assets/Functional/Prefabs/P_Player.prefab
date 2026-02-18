@@ -718,6 +718,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   playerPresetSo: {fileID: 11400000, guid: 3d05d9d7ea1212140a2b662cd8a3b332, type: 2}
   collisionBoxParent: {fileID: 7455594659846731744}
+  animator: {fileID: 3467235740621737927}
   _canMove: 0
   _canStab: 0
   _canSprint: 0
@@ -799,24 +800,10 @@ MonoBehaviour:
         m_CallState: 2
   onStopStabbing:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7877104171207133233}
-        m_TargetAssemblyTypeName: PlayerFeedbackBehavior, Assembly-CSharp
-        m_MethodName: DeactivateStab
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
+  <Combo>k__BackingField: []
+  <ComboCounter>k__BackingField: 0
   currentPlayerState: 0
-  currentStabAttackIndex: 0
-  _stabAttack0Launched: 0
-  _stabAttack1Launched: 0
-  _stabAttack2Launched: 0
 --- !u!114 &7877104171207133233
 MonoBehaviour:
   m_ObjectHideFlags: 0

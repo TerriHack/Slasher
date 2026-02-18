@@ -44,10 +44,11 @@ public class PlayerController : MonoBehaviour
     private KickSo _kickSo;
 
     private List<GameObject> stabAttackCollisionBoxes;
-    [field:SerializeField] public List<StabAttackSo> Combo { get; private set; }
+    
+    public List<StabAttackSo> Combo { get; private set; }
     private float lastStabInputTime;
     private float lastComboEndTime;
-    [field:SerializeField] public int ComboCounter { get; private set; }
+    public int ComboCounter { get; private set; }
     
     private enum PlayerState
     {
