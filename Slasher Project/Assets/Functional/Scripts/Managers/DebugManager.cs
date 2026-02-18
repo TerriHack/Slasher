@@ -45,9 +45,14 @@ public class DebugManager : MonoBehaviour
         debugCanvas.enabled = !debugCanvas.enabled;
     }
 
-    public void ToggleKickDebug()
+    public void OpenKickDebug()
     {
-        kickDebugImage.enabled = !kickDebugImage.enabled;
+        kickDebugImage.enabled = true;
+        StartKickCooldown();
+    }
+    private void CloseKickDebug()
+    {
+        kickDebugImage.enabled = false;
         StartKickCooldown();
     }
 
@@ -63,7 +68,7 @@ public class DebugManager : MonoBehaviour
         kickCountdown += Time.deltaTime;
 
         if (!(kickCountdown >= 1f)) return;
-        ToggleKickDebug();
+        CloseKickDebug();
         kickCountdown = 0f;
         kickCooldownStart = false;
     }

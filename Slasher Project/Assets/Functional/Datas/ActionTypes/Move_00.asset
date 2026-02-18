@@ -12,3 +12,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 517b01040be7bad4ab2dc41e5b3135c8, type: 3}
   m_Name: Move_00
   m_EditorClassIdentifier: Assembly-CSharp::MoveSo
+  <AccelerationCurve>k__BackingField:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: -0.0014343262
+      inSlope: 1.6057371
+      outSlope: 1.6057371
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.12500001
+    - serializedVersion: 3
+      time: 0.2
+      value: 0.1
+      inSlope: 0.011428836
+      outSlope: 0.011428836
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.3124999
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  <DecelerationCurve>k__BackingField:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0.016449565
+      outSlope: 0.016449565
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.21666668
+    - serializedVersion: 3
+      time: 0.2
+      value: 0.1
+      inSlope: 1.2354068
+      outSlope: 1.2354068
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.045833215
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
