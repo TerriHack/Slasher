@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: SO_MovingAgent
   m_EditorClassIdentifier: Assembly-CSharp::SO_Agent
   moveSpeed: 6
+  acceleration: 2.5
   talkProbability: 50
   talkCooldown: 10
   minMaxDelayBeforeMoving: {x: 3, y: 15}

@@ -1,14 +1,17 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
-public class AiVctime : MonoBehaviour
+public class AiVictime : MonoBehaviour
 {
     [SerializeField] private SO_PhaseZeroAgent baseData;
     [SerializeField] private SO_FleeingAgent fleeData;
 
     private NavMeshAgent agent;
+
+    private bool phaseZeroIsEnded;
 
     private float moveSpeedWalk;
     private float moveSpeedRun;
@@ -28,6 +31,8 @@ public class AiVctime : MonoBehaviour
     private float timeToCombo;
     private float damageTimer;
     private bool hasTakenDamage;
+
+    private GameObject player;
     
     #region Init
     private void Start()
@@ -38,6 +43,9 @@ public class AiVctime : MonoBehaviour
         
         agent = gameObject.GetComponent<NavMeshAgent>();
         agent.speed = moveSpeedWalk;
+        agent.acceleration = baseData.acceleration;
+        
+        GameManager.Instance.startFleeingPhase += StartFleeing;
     }
 
     private void InitBaseData()
@@ -64,6 +72,7 @@ public class AiVctime : MonoBehaviour
             return;
         }
         
+        moveSpeedRun = fleeData.moveSpeed;
         bravery = Random.Range(fleeData.minMaxBravery.x, fleeData.minMaxBravery.y);
         timeToCombo = fleeData.timeToCombo;
     }
@@ -84,6 +93,8 @@ public class AiVctime : MonoBehaviour
     #region Phase Zero
     private void PhaseZeroCheckToMove()
     {
+        if (phaseZeroIsEnded) return;
+        
         if (maxMoveRange <= 0) return;
         
         timerBeforeMoving -= Time.deltaTime;
@@ -111,6 +122,8 @@ public class AiVctime : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (phaseZeroIsEnded) return;
+        
         if(!other.CompareTag("Player")) return;
 
         if (talkTimer > 0) return;
@@ -151,11 +164,54 @@ public class AiVctime : MonoBehaviour
     {
         agent.enabled = false;
         DieFeedbacks();
+        UnsubscribeToEverything();
+        DisableThatScript();
+
+        if (!phaseZeroIsEnded)
+        {
+            GameManager.Instance.FirstBlood();
+        }
     }
 
     private void DieFeedbacks()
     {
         transform.LookAt(transform.position + Vector3.up * -5);
+    }
+
+    private void DisableThatScript()
+    {
+        enabled = false;
+    }
+
+    private void UnsubscribeToEverything()
+    {
+        GameManager.Instance.startFleeingPhase -= StartFleeing;
+    }
+    
+    #endregion
+    
+    #region Flee
+
+    private void StartFleeing()
+    {
+        phaseZeroIsEnded = true;
+        agent.enabled = false;
+        agent.speed = 0;
+        player = GameManager.Instance.GetPlayer();
+        
+        transform.LookAt(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z));
+        DialogueManager.Instance.SpawnShockedBubble(gameObject);
+        
+        StartCoroutine(Flee());
+    }
+
+    private IEnumerator Flee()
+    {
+        yield return new WaitForSeconds(delayBeforeFleeing);
+        agent.enabled = true;
+        agent.acceleration = fleeData.acceleration;
+        agent.speed = moveSpeedRun;
+        agent.SetDestination(transform.position + (transform.position - player.transform.position).normalized * 10f);
     }
     
     #endregion
