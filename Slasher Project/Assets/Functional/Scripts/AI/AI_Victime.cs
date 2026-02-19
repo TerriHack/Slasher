@@ -507,6 +507,7 @@ public class AiVictime : MonoBehaviour, IDamageable
 
     private void MoveTo(Vector3 pos)
     {
+        if(!agent.enabled) return;
         targetPos = pos;
         agent.SetDestination(targetPos);
     }
