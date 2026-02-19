@@ -34,6 +34,8 @@ public class KnockableObject : MonoBehaviour, IDamageable
         
         TurnObjectIntoKnockedObject();
         ManagePropsDestruction();
+        
+        GameManager.Instance.UpdateScore(Random.Range(10,20));
     }
     private void TurnObjectIntoKnockedObject()
     {
@@ -48,6 +50,7 @@ public class KnockableObject : MonoBehaviour, IDamageable
         if (_currentLifePoints <= 0)
         {
             Instantiate(knockableObjectSo.DestructionVFX, transform.position,transform.rotation);
+            GameManager.Instance.UpdateScore(Random.Range(50,70));
             Destroy(gameObject);
         }
     }

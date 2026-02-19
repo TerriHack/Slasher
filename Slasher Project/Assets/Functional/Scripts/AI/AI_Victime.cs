@@ -376,6 +376,7 @@ public class AiVictime : MonoBehaviour, IDamageable
 
     public void Die()
     {
+        GameManager.Instance.UpdateScore(Random.Range(555, 999));
         agent.enabled = false;
         DieFeedbacks();
         UnsubscribeToEverything();
@@ -516,6 +517,7 @@ public class AiVictime : MonoBehaviour, IDamageable
 
     public void LeaveHidingSpot()
     {
+        if(!enabled) return;
         GetComponent<MeshRenderer>().enabled = true;
         GetComponent<CapsuleCollider>().enabled = true;
         agent.enabled = true;

@@ -14,6 +14,8 @@ public class PostProcessManager : MonoBehaviour
     [SerializeField] private Canvas canva;
     [SerializeField] private GameObject bloodSplatters;
     [SerializeField] private Sprite[] randomSprites;
+
+    [SerializeField] private bool bloodSplatterOn;
     
     void Awake()
     {
@@ -44,6 +46,8 @@ public class PostProcessManager : MonoBehaviour
         volume.weight = .5f;
         isInKillMode = true;
         onKillTimer = onKillDuration;
+
+        if (!bloodSplatterOn)return;
         
         var blood = Instantiate(bloodSplatters, canva.transform.position, Quaternion.identity, canva.transform);
         bloodSplatters.GetComponent<Image>().sprite = randomSprites[Random.Range(0, randomSprites.Length)];
