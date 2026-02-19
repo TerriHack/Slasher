@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: P_StabAttackCollisionBox_01
       objectReference: {fileID: 0}
+    - target: {fileID: 8975262262557692655, guid: 768bbe673d1f4054899bd8bc54cec66d, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
