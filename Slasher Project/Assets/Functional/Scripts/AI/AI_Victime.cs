@@ -20,16 +20,17 @@ public class AiVictime : MonoBehaviour, IDamageable
 
     private float moveSpeedWalk;
     private float moveSpeedRun;
-    private int bravery;
+    private float bravery;
     private float talkProbability;
     private Vector2 minMaxDelayBeforeMoving;
     private float delayBeforeFleeing;
     private float maxMoveRange;
     private float fleeRadius;
+    private float scareRange;
 
     private float timerBeforeMoving;
     private Vector3 startPos;
-    private Vector3 targetPos;
+    public Vector3 targetPos;
 
     private float talkCooldown;
     private float talkTimer;
@@ -44,8 +45,15 @@ public class AiVictime : MonoBehaviour, IDamageable
     private bool tryToHide;
     private GameObject targetedSpot;
     private bool isHidden;
+    private float regainBraverySpeed;
+    private float minimumBraveryForWeapon;
 
     private bool isInterrupted;
+
+    private float weaponSearchRange;
+    private float delayBeforeShooting;
+    private Weapon selectedWeapon;
+    private bool isShooter;
     
     private GameObject player;
 
@@ -59,6 +67,8 @@ public class AiVictime : MonoBehaviour, IDamageable
         InitBaseData();
         InitFleeData();
         InitTimers();
+        
+        ShowFearLevel();
         
         agent = gameObject.GetComponent<NavMeshAgent>();
         agent.speed = moveSpeedWalk;
@@ -96,6 +106,11 @@ public class AiVictime : MonoBehaviour, IDamageable
         timeToCombo = fleeData.timeToCombo;
         fleeRadius = fleeData.fleeRadius;
         hidingSpotRange = fleeData.hidingSpotRange;
+        scareRange = fleeData.scareRange;
+        regainBraverySpeed = fleeData.regainBraverySpeed;
+        minimumBraveryForWeapon = fleeData.minimumBraveryForWeapon;
+        weaponSearchRange = fleeData.weaponSearchRange;
+        delayBeforeShooting = fleeData.delayBeforeShooting;
     }
 
     private void InitTimers()
@@ -116,6 +131,8 @@ public class AiVictime : MonoBehaviour, IDamageable
         CheckIfDestinationIsReached();
 
         CheckForIsHeGoneVoiceline();
+
+        RegainBravery();
     }
 
     private void ChooseAction()
@@ -125,16 +142,23 @@ public class AiVictime : MonoBehaviour, IDamageable
         if (isInterrupted) return;
 
         talkTimer = talkCooldown;
-        
-        // Courageux = Arme
-        
-        if (Vector3.Distance(player.transform.position, transform.position) <= fleeRadius)
+
+        if (isShooter)
         {
-            Flee();
+            return;
+        }
+
+        if (bravery >= minimumBraveryForWeapon)
+        {
+            GoLookForAWeapon();
+        }
+        else if (Vector3.Distance(player.transform.position, transform.position) > fleeRadius)
+        {
+            LookForHidingSpot();
         }
         else
         {
-            LookForHidingSpot();
+            Flee();
         }
         
         needToSelectAction = false;
@@ -148,6 +172,12 @@ public class AiVictime : MonoBehaviour, IDamageable
 
         if (Vector3.Distance(transform.position, targetPos) <= 2f)
         {
+            if (selectedWeapon != null)
+            {
+                selectedWeapon.PickWeapon();
+                BecomeShooter();
+            }
+            
             if (tryToHide)
             {
                 if (targetedSpot == null)
@@ -246,6 +276,30 @@ public class AiVictime : MonoBehaviour, IDamageable
         damageTimer = timeToCombo;
         hasTakenDamage = true;
         bloodVFX.Play();
+        PostProcessManager.Instance.OnKill();
+        ScareOthers();
+    }
+
+    private void ScareOthers()
+    {
+        var others = Physics.OverlapSphere(transform.position, scareRange);
+
+        if (others.Length <= 0) return;
+        
+        var peopleToScare = new List<GameObject>();
+        
+        foreach (var other in others)
+        {
+            if(other.CompareTag("AI")) peopleToScare.Add(other.gameObject);
+        }
+
+        foreach (var ai in peopleToScare)
+        {
+            if (ai.TryGetComponent(out AiVictime victim))
+            {
+                victim.Fear(10);
+            }
+        }
     }
 
     private void CheckDeathFromDamage()
@@ -261,12 +315,18 @@ public class AiVictime : MonoBehaviour, IDamageable
         agent.enabled = false;
         DieFeedbacks();
         UnsubscribeToEverything();
-        DisableThatScript();
 
+        if (selectedWeapon != null)
+        {
+            selectedWeapon.OnDieUnselect();
+        }
+        
         if (!phaseZeroIsEnded)
         {
             GameManager.Instance.FirstBlood();
         }
+        
+        DisableThatScript();
     }
 
     private void DieFeedbacks()
@@ -341,8 +401,6 @@ public class AiVictime : MonoBehaviour, IDamageable
 
     private void LookForHidingSpot()
     {
-        Debug.Log("LOOK FOR HIDING SPOT");
-
         Collider[] hits = Physics.OverlapSphere(transform.position, hidingSpotRange);
         List<GameObject> possibleHideSpots = new List<GameObject>();
 
@@ -393,6 +451,7 @@ public class AiVictime : MonoBehaviour, IDamageable
         agent.enabled = true;
         isHidden = false;
         InterruptAction(false);
+        ShowFearLevel();
     }
     
     #endregion
@@ -402,6 +461,8 @@ public class AiVictime : MonoBehaviour, IDamageable
         targetPos = pos;
         agent.SetDestination(targetPos);
     }
+
+    #region Talk
 
     private void CheckForIsHeGoneVoiceline()
     {
@@ -426,9 +487,78 @@ public class AiVictime : MonoBehaviour, IDamageable
     {
         if(!phaseZeroIsEnded || isHidden) talkTimer -= Time.deltaTime;
     }
+    
+    #endregion
 
-    public void Fear()
+    #region Bravery
+
+    private void ShowFearLevel()
     {
-        talkTimer = talkCooldown;
+        if (isShooter) return;
+        var mat = GetComponent<MeshRenderer>().material;
+        mat.color = Color.Lerp(Color.red, Color.green, bravery/100f);
     }
+    public void Fear(int amount)
+    {
+        bravery = Mathf.Clamp(bravery - amount, 0, 100);
+        talkTimer = talkCooldown;
+        ShowFearLevel();
+    }
+
+    private void RegainBravery()
+    {
+        if(!isHidden) return;
+
+        bravery += Time.deltaTime * regainBraverySpeed;
+    }
+    
+    #endregion
+    
+    #region Weapon
+
+    private void GoLookForAWeapon()
+    {
+        Debug.Log("Go look for a weapon");
+        
+        Collider[] hits = Physics.OverlapSphere(transform.position, weaponSearchRange);
+        List<GameObject> possibleWeapons = new List<GameObject>();
+
+        if (hits.Length <= 0)
+        {
+            Flee();
+            return;
+        }
+        
+        foreach (var hit in hits)
+        {
+            if (hit.GetComponent<Collider>().CompareTag("Weapon"))
+            {
+                Weapon script = hit.gameObject.GetComponent<Weapon>();
+                
+                if(script.IsSelected()) possibleWeapons.Add(hit.gameObject);
+                script.SelectThisWeapon();
+                selectedWeapon = script;
+                MoveTo(hit.transform.position);
+                
+                Debug.Log("<color=yellow>Arme trouvée, déplacement vers " + script.transform.position);
+                
+                break;
+            }
+        }
+
+        if (possibleWeapons.Count <= 0)
+        {
+            Flee();
+        }
+    }
+    
+    private void BecomeShooter()
+    {
+        selectedWeapon = null;
+        isShooter = true;
+        var mat = GetComponent<MeshRenderer>().material;
+        mat.color = Color.blue;
+    }
+    
+    #endregion
 }

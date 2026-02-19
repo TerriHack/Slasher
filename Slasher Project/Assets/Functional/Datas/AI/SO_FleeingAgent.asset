@@ -15,6 +15,11 @@ MonoBehaviour:
   moveSpeed: 10
   acceleration: 6
   fleeRadius: 18
-  timeToCombo: 0.5
-  minMaxBravery: {x: 10, y: 80}
+  timeToCombo: 0.75
+  minMaxBravery: {x: 40, y: 80}
+  scareRange: 15
+  regainBraverySpeed: 10
+  minimumBraveryForWeapon: 60
   hidingSpotRange: 50
+  weaponSearchRange: 50
+  delayBeforeShooting: 3

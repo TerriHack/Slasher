@@ -49,7 +49,7 @@ GameObject:
   - component: {fileID: 4392358506202580875}
   m_Layer: 0
   m_Name: AI_Victime
-  m_TagString: Untagged
+  m_TagString: AI
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

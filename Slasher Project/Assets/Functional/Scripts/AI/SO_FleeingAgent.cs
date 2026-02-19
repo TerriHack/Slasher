@@ -13,7 +13,14 @@ public class SO_FleeingAgent : ScriptableObject
 
     [Header("Bravery")] 
     public Vector2Int minMaxBravery;
+    public float scareRange;
+    public float regainBraverySpeed;
+    public float minimumBraveryForWeapon;
 
     [Header("Hiding")] 
     public float hidingSpotRange;
+
+    [Header("Weapon")] 
+    public float weaponSearchRange;
+    public float delayBeforeShooting;
 }
