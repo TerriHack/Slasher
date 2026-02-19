@@ -6,18 +6,20 @@ public class MoveCamera : MonoBehaviour
     [HideInInspector] public Vector2Int dimensions;
     
     private PlayerController player;
+    private CameraController cameraController;
 
-    private bool _transitionStarted;
-    private float  _transitionCountdown;
+    
     
     void Start()
     {
         cam = Camera.main;
         player = PlayerController.Instance;
+        cameraController = CameraController.Instance;
     }
 
     void OnTriggerEnter(Collider other)
     {
+        if(player == null) return;
         if (!other.CompareTag("Player")) return;
 
         MoveCam();
@@ -38,12 +40,7 @@ public class MoveCamera : MonoBehaviour
             direction.x = 0;
             direction.z = dimensions.y * (direction.z < 0 ? -1 : 1);
         }
-
-        cam.transform.position += direction; // Pour Terri, à toi de Lerp ou de faire un truc stylé
-    }
-
-    private void TransitionCooldown()
-    {
         
+        cameraController.StartCameraTransition( cameraController.PreviousPosition,cameraController.PreviousPosition + direction);
     }
 }

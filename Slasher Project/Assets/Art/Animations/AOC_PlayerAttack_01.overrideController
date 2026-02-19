@@ -9,5 +9,5 @@ AnimatorOverrideController:
   m_Name: AOC_PlayerAttack_01
   m_Controller: {fileID: 9100000, guid: ee3059329d8ce03459d0c4c938c9fcfb, type: 2}
   m_Clips:
-  - m_OriginalClip: {fileID: -203655887218126122, guid: 2a96b8ba3799e9043b540aba01be627a, type: 3}
-    m_OverrideClip: {fileID: -203655887218126122, guid: 493b39349ea3bcf4fa9d1b6c4572fb66, type: 3}
+  - m_OriginalClip: {fileID: -203655887218126122, guid: e52b49e78635d5d40812ff11c970ec78, type: 3}
+    m_OverrideClip: {fileID: -203655887218126122, guid: e52b49e78635d5d40812ff11c970ec78, type: 3}
