@@ -14,6 +14,7 @@ public class LevelGenerator : MonoBehaviour
     private List<GameObject> clusterDoors2 = new List<GameObject>();
     private List<GameObject> clusterDoors3 = new List<GameObject>();
     private List<GameObject> clusterDoors4 = new List<GameObject>();
+    [SerializeField] private GameObject camTriggerZone;
 
     public List<Rooms> roomsList;
     
@@ -109,6 +110,9 @@ public class LevelGenerator : MonoBehaviour
                 GameObject roomToSpawn = roomsList[type].rooms[r];
                 
                 var room = Instantiate(roomToSpawn, new Vector3(i*dimensions.x, 0, j*dimensions.y), Quaternion.identity, transform);
+                var triggerZone = Instantiate(camTriggerZone, room.transform.position, Quaternion.identity, transform);
+                triggerZone.transform.localScale = new Vector3(dimensions.x * 0.925f, 5, dimensions.y * 0.925f);
+                triggerZone.GetComponent<MoveCamera>().dimensions = dimensions;
             }
         }
     }
