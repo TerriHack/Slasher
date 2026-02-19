@@ -39,7 +39,7 @@ public class DialogueBubble : Bubble
                 break;
         }
         
-        //bubbleImage.sprite = bubbleSprites[type];
+        bubbleImage.sprite = bubbleSprites[type];
         bubbleText.text = text;
     }
 
