@@ -6,7 +6,7 @@ using UnityEngine.AI;
 using UnityEngine.Rendering.Universal;
 using Random = UnityEngine.Random;
 
-public class AiVictime : MonoBehaviour
+public class AiVictime : MonoBehaviour, IDamageable
 {
     [SerializeField] private SO_PhaseZeroAgent baseData;
     [SerializeField] private SO_FleeingAgent fleeData;

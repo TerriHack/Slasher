@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class HidingSpot : MonoBehaviour
+public class HidingSpot : MonoBehaviour, IDamageable
 {
     [SerializeField] private int maxCapacity;
     private int currentPeopleInIt;
@@ -22,5 +22,10 @@ public class HidingSpot : MonoBehaviour
     public bool HasRoom()
     {
         return currentPeopleInIt < maxCapacity;
+    }
+
+    public void TakeDamage()
+    {
+        Destroy(gameObject);
     }
 }
