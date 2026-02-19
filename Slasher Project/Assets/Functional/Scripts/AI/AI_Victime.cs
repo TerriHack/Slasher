@@ -40,9 +40,11 @@ public class AiVictime : MonoBehaviour, IDamageable
 
     private float hidingSpotRange;
     private bool tryToHide;
-    private GameObject targetedSpot;
+    public GameObject targetedSpot;
     private bool isHidden;
 
+    private bool isInterrupted;
+    
     private GameObject player;
 
     [SerializeField] private GameObject bloodSplatter;
@@ -112,6 +114,8 @@ public class AiVictime : MonoBehaviour, IDamageable
     {
         if (!needToSelectAction) return;
 
+        if (isInterrupted) return;
+
         // Courageux = Arme
         
         if (Vector3.Distance(player.transform.position, transform.position) <= fleeRadius)
@@ -136,7 +140,7 @@ public class AiVictime : MonoBehaviour, IDamageable
         {
             if (tryToHide)
             {
-                if (targetedSpot.GetComponent<HidingSpot>().TryHiding())
+                if (targetedSpot.GetComponent<HidingSpot>().TryHiding(gameObject))
                 {
                     Hide();
                     return;
@@ -147,14 +151,22 @@ public class AiVictime : MonoBehaviour, IDamageable
         }
     }
 
-    private void InterruptAction(bool definitive)
+    public void InterruptAction(bool definitive)
     {
         if (!phaseZeroIsEnded) return;
 
-        agent.SetDestination(transform.position);
-        tryToHide = false;
+        MoveTo(transform.position);
         
-        if (!definitive) needToSelectAction = true;
+        tryToHide = false;
+
+        if (!definitive)
+        {
+            needToSelectAction = true;
+        }
+        else
+        {
+            isInterrupted = true;
+        }
     }
 
     #region Phase Zero
@@ -179,8 +191,7 @@ public class AiVictime : MonoBehaviour, IDamageable
             NavMeshHit hit;
             if (NavMesh.SamplePosition(target, out hit, 50f, NavMesh.AllAreas))
             {
-                targetPos = hit.position;
-                agent.SetDestination(targetPos);
+                MoveTo(hit.position);
             }
 
             timerBeforeMoving = Random.Range(minMaxDelayBeforeMoving.x, minMaxDelayBeforeMoving.y);
@@ -299,8 +310,7 @@ public class AiVictime : MonoBehaviour, IDamageable
         if (NavMesh.SamplePosition(transform.position + randomDirection * 10f, out NavMeshHit hit, 10f,
                 NavMesh.AllAreas))
         {
-            targetPos = hit.position;
-            agent.SetDestination(targetPos);
+            MoveTo(hit.position);
         }
         else
         {
@@ -343,8 +353,9 @@ public class AiVictime : MonoBehaviour, IDamageable
         if (NavMesh.SamplePosition(hiddenSpot.transform.position, out NavMeshHit hit, 5f, NavMesh.AllAreas))
         {
             targetedSpot = hiddenSpot;
-            targetPos = hit.position;
-            agent.SetDestination(targetPos);
+            
+            MoveTo(hit.position);
+            
             tryToHide = true;
             Debug.Log("Hiding Spot Found");
         }
@@ -353,10 +364,27 @@ public class AiVictime : MonoBehaviour, IDamageable
     private void Hide()
     {
         GetComponent<MeshRenderer>().enabled = false;
+        GetComponent<CapsuleCollider>().enabled = false;
+        agent.enabled = false;
         isHidden = true;
+    }
+
+    public void LeaveHidingSpot()
+    {
+        GetComponent<MeshRenderer>().enabled = true;
+        GetComponent<CapsuleCollider>().enabled = true;
+        agent.enabled = true;
+        isHidden = false;
+        InterruptAction(false);
     }
     
     #endregion
+
+    private void MoveTo(Vector3 pos)
+    {
+        targetPos = pos;
+        agent.SetDestination(targetPos);
+    }
 
     private void OnDrawGizmos()
     {
