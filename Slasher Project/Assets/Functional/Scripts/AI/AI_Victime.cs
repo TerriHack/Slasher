@@ -478,6 +478,7 @@ public class AiVictime : MonoBehaviour, IDamageable
         agent.enabled = true;
         isHidden = false;
         InterruptAction(false);
+        targetedSpot.GetComponent<HidingSpot>().LeaveHidingSpot(gameObject);
         ShowFearLevel();
     }
     
