@@ -13,6 +13,7 @@ public class AiVictime : MonoBehaviour, IDamageable
     [SerializeField] private SO_PhaseZeroAgent baseData;
     [SerializeField] private SO_FleeingAgent fleeData;
     [SerializeField] private ParticleSystem bloodVFX;
+    [SerializeField] private Animator animator;
 
     private NavMeshAgent agent;
 
@@ -133,6 +134,20 @@ public class AiVictime : MonoBehaviour, IDamageable
         CheckForIsHeGoneVoiceline();
 
         RegainBravery();
+        
+        MoveAnim();
+    }
+
+    private void MoveAnim()
+    {
+        if (agent.velocity.magnitude > 0.2f)
+        {
+            animator.SetBool("isMoving",true);
+        }
+        else
+        {
+            animator.SetBool("isMoving",false);
+        }
     }
 
     private void ChooseAction()
@@ -336,6 +351,8 @@ public class AiVictime : MonoBehaviour, IDamageable
         var blood = Instantiate(bloodSplatter, transform.position + Vector3.down, transform.rotation);
         blood.GetComponent<DecalProjector>().size = Random.Range(0.8f, 4f) * Vector3.one;
         blood.transform.RotateAround(Vector3.up, Random.Range(0, 360));
+        
+        animator.enabled = false;
     }
 
     private void DisableThatScript()
@@ -354,6 +371,8 @@ public class AiVictime : MonoBehaviour, IDamageable
 
     private void StartFleeing()
     {
+        animator.SetBool("isTerrified", true);
+        
         phaseZeroIsEnded = true;
         agent.enabled = false;
         agent.speed = 0;
@@ -361,7 +380,7 @@ public class AiVictime : MonoBehaviour, IDamageable
         
         transform.LookAt(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z));
         DialogueManager.Instance.SpawnShockedBubble(gameObject);
-        
+       
         StartCoroutine(WaitBeforeFlee());
     }
 
@@ -381,6 +400,8 @@ public class AiVictime : MonoBehaviour, IDamageable
     private void Flee()
     {
         Debug.Log("FLEE");
+        animator.SetBool("isTerrified", false);
+        animator.SetBool("isRunning", true);
         var direction = transform.position - player.transform.position;
         direction.y = 0;
         var randomDirection = (Quaternion.AngleAxis(Random.Range(-60, 60), Vector3.up) * direction).normalized;
