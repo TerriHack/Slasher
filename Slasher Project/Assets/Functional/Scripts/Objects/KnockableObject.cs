@@ -1,7 +1,7 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class KnockableObject : MonoBehaviour
+public class KnockableObject : MonoBehaviour, IDamageable
 {
     [SerializeField] private KnockableObjectSo knockableObjectSo;
     [SerializeField] private LayerMask knockedObjectLayer;
@@ -15,6 +15,11 @@ public class KnockableObject : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _currentLifePoints = knockableObjectSo.LifePoints;
+    }
+
+    public void TakeDamage()
+    {
+        Eject(PlayerController.Instance.transform.position);
     }
 
     public void Eject(Vector3 hitPointPos)

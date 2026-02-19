@@ -139,9 +139,10 @@ public class PlayerController : MonoBehaviour
     }
     private void CharacterRotation()
     {
-        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, MathF.Atan2(_lastMoveDir.x, _lastMoveDir.y) * Mathf.Rad2Deg,ref r, 0.1f);
+        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, MathF.Atan2(_lastMoveDir.x, _lastMoveDir.y) * Mathf.Rad2Deg,ref r, 0.2f);
         transform.rotation = Quaternion.Euler(0, angle, 0);
     }
+    
     
     private Vector3 GetMovement()
     {
@@ -150,6 +151,13 @@ public class PlayerController : MonoBehaviour
         if (_inputHandler.MoveInput != Vector2.zero) _lastMoveDir = _inputHandler.MoveInput;
         
         Vector3 movement = new Vector3(_lastMoveDir.x, 0, _lastMoveDir.y);
+
+        if (IsCollidingWithWall())
+        {
+            onStopWalking.Invoke();
+            return movement * _moveSo.DecelerationCurve.Evaluate(_movementValue);
+            
+        }
         
         if (_isMoving)
         {
@@ -160,6 +168,18 @@ public class PlayerController : MonoBehaviour
         onStopWalking.Invoke();
         return movement * _moveSo.DecelerationCurve.Evaluate(_movementValue);
 
+    }
+
+    private bool IsCollidingWithWall()
+    {
+        RaycastHit raycastHit;
+        
+        Debug.DrawRay(transform.localPosition, Vector3.forward*3, Color.red);
+        if (Physics.Raycast(transform.localPosition, Vector3.forward * 3, out raycastHit))
+        {
+            if (raycastHit.collider.tag == "Wall") return true;
+        }
+        return false;
     }
     private void MovementValueCalculation()
     {

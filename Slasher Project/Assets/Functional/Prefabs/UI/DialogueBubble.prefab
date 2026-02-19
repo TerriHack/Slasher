@@ -32,10 +32,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1426467871560804329}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 176.7305, y: 50}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0.000015258789, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3693983625333408602
 CanvasRenderer:
@@ -67,15 +67,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: Sympa ton costume mec...
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e2e10fc0629e1ea4b9f11b45c3171387, type: 2}
+  m_sharedMaterial: {fileID: 992248328758825962, guid: e2e10fc0629e1ea4b9f11b45c3171387, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4278387502
+  m_fontColor: {r: 0.18039216, g: 0.011764706, b: 0.011764706, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -92,12 +92,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.3
+  m_fontSize: 32
   m_fontSizeBase: 20.3
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 16
+  m_fontSizeMax: 32
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -172,7 +172,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 99.2, y: 40.7}
-  m_SizeDelta: {x: 178.2278, y: 70}
+  m_SizeDelta: {x: 220, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4846701965422060593
 CanvasRenderer:
@@ -202,9 +202,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: bd757a929ba8aff48aa7be1cc54d2389, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -274,7 +274,11 @@ MonoBehaviour:
   startAnimation: {fileID: -3912537549279613802}
   bubbleImage: {fileID: 8685783935292290671}
   bubbleText: {fileID: 6311017925579181348}
-  bubbleSprites: []
+  bubbleSprites:
+  - {fileID: 21300000, guid: c9cbb24a6c42a2b4886dc2165af873e9, type: 3}
+  - {fileID: 21300000, guid: 1d82c57cc66f5a542b5232c9659c0fcc, type: 3}
+  - {fileID: 21300000, guid: fe443a5a71cd0094196ae2898a45881e, type: 3}
+  - {fileID: 21300000, guid: 34a30f0f37f49874f9f93f61773c3633, type: 3}
   phaseZeroDialogues:
   - Sympa ton costume
   - "D\xE9gage de l\xE0, loser"
@@ -287,7 +291,12 @@ MonoBehaviour:
   - Heu... bonjour ?
   fleeDialogues: []
   attackDialogues: []
-  isHeGoneDialogues: []
+  isHeGoneDialogues:
+  - Vous pensez qu'il est parti ?
+  - "Je crois qu'on est en s\xE9curit\xE9..."
+  - Chut, ne faites pas de bruit !
+  - Vous entendez quelque chose ?
+  - "A\xEFe, mon pied !"
 --- !u!111 &-3912537549279613802
 Animation:
   m_ObjectHideFlags: 0

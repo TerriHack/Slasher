@@ -1,15 +1,21 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering.Universal;
 using Random = UnityEngine.Random;
 
-public class AiVictime : MonoBehaviour
+public class AiVictime : MonoBehaviour, IDamageable
 {
+    #region Variables
+    
     [SerializeField] private SO_PhaseZeroAgent baseData;
     [SerializeField] private SO_FleeingAgent fleeData;
     [SerializeField] private ParticleSystem bloodVFX;
+    [SerializeField] private GameObject[] characters;
+    
+    private Animator _currentAnimator;
 
     private NavMeshAgent agent;
 
@@ -17,16 +23,17 @@ public class AiVictime : MonoBehaviour
 
     private float moveSpeedWalk;
     private float moveSpeedRun;
-    private int bravery;
+    private float bravery;
     private float talkProbability;
     private Vector2 minMaxDelayBeforeMoving;
     private float delayBeforeFleeing;
     private float maxMoveRange;
-    private float steering;
+    private float fleeRadius;
+    private float scareRange;
 
     private float timerBeforeMoving;
     private Vector3 startPos;
-    private Vector3 targetPos;
+    public Vector3 targetPos;
 
     private float talkCooldown;
     private float talkTimer;
@@ -35,20 +42,41 @@ public class AiVictime : MonoBehaviour
     private float damageTimer;
     private bool hasTakenDamage;
 
-    private bool isFleeing;
-    private float fleeRecalculationCooldown = 2f;
-    private float fleeRecalculationTimer;
+    private bool needToSelectAction;
 
+    private float hidingSpotRange;
+    private bool tryToHide;
+    private GameObject targetedSpot;
+    private bool isHidden;
+    private float regainBraverySpeed;
+    private float minimumBraveryForWeapon;
+    private float maxBraveryToHide;
+
+    private bool isInterrupted;
+
+    private float weaponSearchRange;
+    private float delayBeforeShooting;
+    private float delayBeforeShootingTimer;
+    private Weapon selectedWeapon;
+    private bool isShooter;
+    private float maxShootingRange;
+    private bool isAiming;
+    
     private GameObject player;
 
     [SerializeField] private GameObject bloodSplatter;
     
+    #endregion
+    
     #region Init
     private void Start()
     {
+        InitCharacterVisuals();
         InitBaseData();
         InitFleeData();
         InitTimers();
+        
+        ShowFearLevel();
         
         agent = gameObject.GetComponent<NavMeshAgent>();
         agent.speed = moveSpeedWalk;
@@ -57,6 +85,24 @@ public class AiVictime : MonoBehaviour
         GameManager.Instance.startFleeingPhase += StartFleeing;
     }
 
+    private void InitCharacterVisuals()
+    {
+        int selectedIndex = Random.Range(0, characters.Length);
+
+        for (int i = 0; i < characters.Length; i++)
+        {
+            if (i != selectedIndex)
+            {
+                characters[i].SetActive(false);
+            }
+            else
+            {
+                characters[i].SetActive(true);
+                _currentAnimator = characters[i].GetComponent<Animator>();
+            }
+        }
+    }
+    
     private void InitBaseData()
     {
         if (baseData == null)
@@ -84,21 +130,153 @@ public class AiVictime : MonoBehaviour
         moveSpeedRun = fleeData.moveSpeed;
         bravery = Random.Range(fleeData.minMaxBravery.x, fleeData.minMaxBravery.y);
         timeToCombo = fleeData.timeToCombo;
-        steering = fleeData.steering;
+        fleeRadius = fleeData.fleeRadius;
+        hidingSpotRange = fleeData.hidingSpotRange;
+        scareRange = fleeData.scareRange;
+        regainBraverySpeed = fleeData.regainBraverySpeed;
+        minimumBraveryForWeapon = fleeData.minimumBraveryForWeapon;
+        weaponSearchRange = fleeData.weaponSearchRange;
+        delayBeforeShooting = fleeData.delayBeforeShooting;
+        maxBraveryToHide = fleeData.maxBraveryToHide;
+        maxShootingRange = fleeData.maxShootingRange;
     }
 
     private void InitTimers()
     {
         timerBeforeMoving = Random.Range(minMaxDelayBeforeMoving.x, minMaxDelayBeforeMoving.y);
+        delayBeforeShootingTimer = delayBeforeShooting;
     }
     
     #endregion
 
     private void Update()
     {
+        DecreaseTalkTimer();
+        
         PhaseZeroCheckToMove();
         CheckDeathFromDamage();
-        Flee();
+        
+        ChooseAction();
+        CheckIfDestinationIsReached();
+
+        CheckForIsHeGoneVoiceline();
+
+        RegainBravery();
+        
+        MoveAnim();
+        
+        Aim();
+    }
+
+    private void MoveAnim()
+    {
+        if (agent.velocity.magnitude > 0.2f)
+        {
+            _currentAnimator.SetBool("isMoving",true);
+        }
+        else
+        {
+            _currentAnimator.SetBool("isMoving",false);
+        }
+    }
+
+    private void ChooseAction()
+    {
+        if (!needToSelectAction) return;
+
+        if (isInterrupted) return;
+
+        talkTimer = talkCooldown;
+
+        if (isShooter)
+        {
+            if (isAiming)
+            {
+                transform.LookAt(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z));
+                return;
+            }
+            if (Vector3.Distance(transform.position, player.transform.position) < maxShootingRange)
+            {
+                isAiming = true;
+                return;
+            }
+            else
+            {
+                transform.LookAt(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z));
+                needToSelectAction = true;
+                return;
+            }
+        }
+
+        if (bravery >= minimumBraveryForWeapon)
+        {
+            GoLookForAWeapon();
+        }
+        else if (Vector3.Distance(player.transform.position, transform.position) > fleeRadius && bravery <= maxBraveryToHide)
+        {
+            LookForHidingSpot();
+        }
+        else
+        {
+            Flee();
+        }
+        
+        needToSelectAction = false;
+    }
+
+    private void CheckIfDestinationIsReached()
+    {
+        if (!phaseZeroIsEnded) return;
+
+        if (isHidden) return;
+
+        if (Vector3.Distance(transform.position, targetPos) <= 2f)
+        {
+            if (selectedWeapon != null)
+            {
+                Debug.LogFormat("<color=yellow> Reached Destination {0}, current position {1}", targetPos, transform.position);
+                
+                selectedWeapon.PickWeapon();
+                BecomeShooter();
+            }
+            
+            if (tryToHide)
+            {
+                if (targetedSpot == null)
+                {
+                    tryToHide = false;
+                    needToSelectAction = true;
+                    return;
+                }
+                
+                if (targetedSpot.GetComponent<HidingSpot>().TryHiding(gameObject))
+                {
+                    Hide();
+                    return;
+                }
+            }
+            
+            needToSelectAction = true;
+        }
+    }
+
+    public void InterruptAction(bool definitive)
+    {
+        if (!phaseZeroIsEnded) return;
+
+        MoveTo(transform.position);
+        
+        tryToHide = false;
+        selectedWeapon = null;
+
+        if (!definitive)
+        {
+            needToSelectAction = true;
+        }
+        else
+        {
+            isInterrupted = true;
+        }
     }
 
     #region Phase Zero
@@ -123,8 +301,7 @@ public class AiVictime : MonoBehaviour
             NavMeshHit hit;
             if (NavMesh.SamplePosition(target, out hit, 50f, NavMesh.AllAreas))
             {
-                targetPos = hit.position;
-                agent.SetDestination(targetPos);
+                MoveTo(hit.position);
             }
 
             timerBeforeMoving = Random.Range(minMaxDelayBeforeMoving.x, minMaxDelayBeforeMoving.y);
@@ -162,6 +339,31 @@ public class AiVictime : MonoBehaviour
         damageTimer = timeToCombo;
         hasTakenDamage = true;
         bloodVFX.Play();
+        PostProcessManager.Instance.OnKill();
+        InterruptAction(true);
+        ScareOthers();
+    }
+
+    private void ScareOthers()
+    {
+        var others = Physics.OverlapSphere(transform.position, scareRange);
+
+        if (others.Length <= 0) return;
+        
+        var peopleToScare = new List<GameObject>();
+        
+        foreach (var other in others)
+        {
+            if(other.CompareTag("AI")) peopleToScare.Add(other.gameObject);
+        }
+
+        foreach (var ai in peopleToScare)
+        {
+            if (ai.TryGetComponent(out AiVictime victim))
+            {
+                victim.Fear(10);
+            }
+        }
     }
 
     private void CheckDeathFromDamage()
@@ -177,12 +379,18 @@ public class AiVictime : MonoBehaviour
         agent.enabled = false;
         DieFeedbacks();
         UnsubscribeToEverything();
-        DisableThatScript();
 
+        if (selectedWeapon != null)
+        {
+            selectedWeapon.OnDieUnselect();
+        }
+        
         if (!phaseZeroIsEnded)
         {
             GameManager.Instance.FirstBlood();
         }
+        
+        DisableThatScript();
     }
 
     private void DieFeedbacks()
@@ -192,11 +400,13 @@ public class AiVictime : MonoBehaviour
         var blood = Instantiate(bloodSplatter, transform.position + Vector3.down, transform.rotation);
         blood.GetComponent<DecalProjector>().size = Random.Range(0.8f, 4f) * Vector3.one;
         blood.transform.RotateAround(Vector3.up, Random.Range(0, 360));
+        
+        _currentAnimator.enabled = false;
     }
 
     private void DisableThatScript()
     {
-        enabled = false;
+        Destroy(this);
     }
 
     private void UnsubscribeToEverything()
@@ -206,10 +416,12 @@ public class AiVictime : MonoBehaviour
     
     #endregion
     
-    #region Flee
+    #region Phase Zero Ending
 
     private void StartFleeing()
     {
+        _currentAnimator.SetBool("isTerrified", true);
+        
         phaseZeroIsEnded = true;
         agent.enabled = false;
         agent.speed = 0;
@@ -217,7 +429,7 @@ public class AiVictime : MonoBehaviour
         
         transform.LookAt(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z));
         DialogueManager.Instance.SpawnShockedBubble(gameObject);
-        
+       
         StartCoroutine(WaitBeforeFlee());
     }
 
@@ -227,51 +439,214 @@ public class AiVictime : MonoBehaviour
         agent.enabled = true;
         agent.acceleration = fleeData.acceleration;
         agent.speed = moveSpeedRun;
-        isFleeing = true;
+        needToSelectAction = true;
     }
-
+    
+    #endregion
+    
+    #region Flee
+    
     private void Flee()
     {
-        if(!isFleeing) return;
-
-        if (fleeRecalculationTimer > 0)
+        Debug.Log("FLEE");
+        _currentAnimator.SetBool("isTerrified", false);
+        _currentAnimator.SetBool("isRunning", true);
+        var direction = transform.position - player.transform.position;
+        direction.y = 0;
+        var randomDirection = (Quaternion.AngleAxis(Random.Range(-60, 60), Vector3.up) * direction).normalized;
+        if (NavMesh.SamplePosition(transform.position + randomDirection * 10f, out NavMeshHit hit, 10f,
+                NavMesh.AllAreas))
         {
-            fleeRecalculationTimer -= Time.deltaTime;
+            MoveTo(hit.position);
+        }
+        else
+        {
+            LookForHidingSpot();
+        }
+    }
+    
+    #endregion
+     
+    #region Hide
+
+    private void LookForHidingSpot()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, hidingSpotRange);
+        List<GameObject> possibleHideSpots = new List<GameObject>();
+
+        foreach (var hit in hits)
+        {
+            if (hit.GetComponent<Collider>().CompareTag("Hiding"))
+            {
+                if(hit.gameObject.GetComponent<HidingSpot>().HasRoom()) possibleHideSpots.Add(hit.gameObject);
+            }
+        }
+
+        if (possibleHideSpots.Count <= 0)
+        {
+            Debug.Log("NO HIDING SPOT");
+            Flee();
+        }
+        else
+        {
+            GoToHidingSpot(possibleHideSpots[Random.Range(0, possibleHideSpots.Count)]);
+        }
+    }
+
+    private void GoToHidingSpot(GameObject hiddenSpot)
+    {
+        if (NavMesh.SamplePosition(hiddenSpot.transform.position, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+        {
+            targetedSpot = hiddenSpot;
+            
+            MoveTo(hit.position);
+            
+            tryToHide = true;
+            Debug.Log("Hiding Spot Found");
+        }
+    }
+
+    private void Hide()
+    {
+        GetComponent<MeshRenderer>().enabled = false;
+        GetComponent<CapsuleCollider>().enabled = false;
+        agent.enabled = false;
+        isHidden = true;
+    }
+
+    public void LeaveHidingSpot()
+    {
+        GetComponent<MeshRenderer>().enabled = true;
+        GetComponent<CapsuleCollider>().enabled = true;
+        agent.enabled = true;
+        isHidden = false;
+        InterruptAction(false);
+        targetedSpot.GetComponent<HidingSpot>().LeaveHidingSpot(gameObject);
+        ShowFearLevel();
+    }
+    
+    #endregion
+
+    private void MoveTo(Vector3 pos)
+    {
+        targetPos = pos;
+        agent.SetDestination(targetPos);
+    }
+
+    #region Talk
+
+    private void CheckForIsHeGoneVoiceline()
+    {
+        if (!isHidden) return;
+      
+        if (talkTimer > 0) return;
+
+        if (Random.Range(0, 100) > talkProbability)
+        {
+            talkTimer = talkCooldown;
             return;
         }
         
-        fleeRecalculationTimer = fleeRecalculationCooldown;
-        
-        Vector3 awayFromPlayer = (transform.position - player.transform.position).normalized;
-
-        float fleeDistance = 20f;
-        float coneAngle = 360f;
-        int tries = 100;
-
-        float bestDistance = 0;
-
-        Vector3 bestPlaceToFlee = transform.position;
-
-        for (int i = 0; i < tries; i++)
+        if (DialogueManager.Instance.SpawnDialogueBubble(gameObject, 3))
         {
-            float angle = Random.Range(-coneAngle * 0.5f, coneAngle * 0.5f);
-            Vector3 newDirection = Quaternion.AngleAxis(angle, Vector3.up) * awayFromPlayer;
+            talkTimer = talkCooldown;
+            Debug.Log("TALK");
+        }
+    }
 
-            Vector3 spotToCheck = transform.position + newDirection * fleeDistance;
+    private void DecreaseTalkTimer()
+    {
+        if(!phaseZeroIsEnded || isHidden) talkTimer -= Time.deltaTime;
+    }
+    
+    #endregion
 
-            if (NavMesh.SamplePosition(spotToCheck, out NavMeshHit hit, 10f, NavMesh.AllAreas))
+    #region Bravery
+
+    private void ShowFearLevel()
+    {
+        if (isShooter) return;
+        var mat = GetComponent<MeshRenderer>().material;
+        mat.color = Color.Lerp(Color.red, Color.green, bravery/100f);
+    }
+    public void Fear(int amount)
+    {
+        bravery = Mathf.Clamp(bravery - amount, 0, 100);
+        talkTimer = talkCooldown;
+        ShowFearLevel();
+    }
+
+    private void RegainBravery()
+    {
+        if(!isHidden) return;
+
+        bravery += Time.deltaTime * regainBraverySpeed;
+
+        if (bravery > maxBraveryToHide)
+        {
+            LeaveHidingSpot();
+        }
+    }
+    
+    #endregion
+    
+    #region Weapon
+
+    private void GoLookForAWeapon()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, weaponSearchRange);
+
+        if (hits.Length <= 0)
+        {
+            Flee();
+            return;
+        }
+        
+        foreach (var hit in hits)
+        {
+            if (hit.GetComponent<Collider>().CompareTag("Weapon"))
             {
-                float distanceToPlayer = Vector3.Distance(hit.position, player.transform.position);
-                
-                if (distanceToPlayer > bestDistance)
-                {
-                    bestDistance = distanceToPlayer;
-                    bestPlaceToFlee = hit.position;
-                }
+                Weapon script = hit.gameObject.GetComponent<Weapon>();
+
+                if (script.IsSelected()) continue;
+                script.SelectThisWeapon();
+                selectedWeapon = script;
+                MoveTo(hit.transform.position);
+
+                return;
             }
         }
         
-        agent.SetDestination(bestPlaceToFlee);
+        Flee();
+    }
+    
+    private void BecomeShooter()
+    {
+        selectedWeapon = null;
+        isShooter = true;
+        var mat = GetComponent<MeshRenderer>().material;
+        mat.color = Color.blue;
+    }
+
+    private void Aim()
+    {
+        if (!isAiming) return;
+
+        needToSelectAction = false;
+        
+        delayBeforeShootingTimer -= Time.deltaTime;
+        if (delayBeforeShootingTimer <= 0 &&
+            Vector3.Distance(transform.position, player.transform.position) < maxShootingRange)
+        {
+            Shoot();
+        }
+    }
+
+    private void Shoot()
+    {
+        Debug.Log("SHOOT");
+        delayBeforeShootingTimer = delayBeforeShooting + 2f;
+        needToSelectAction = true;
     }
     
     #endregion
