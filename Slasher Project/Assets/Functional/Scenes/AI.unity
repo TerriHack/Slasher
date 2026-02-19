@@ -1863,6 +1863,10 @@ PrefabInstance:
       propertyPath: m_IsKinematic
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 293043356462363397, guid: ff6102e6cdba3834ca61198a08bb3460, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 826914744241997971, guid: ff6102e6cdba3834ca61198a08bb3460, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -1961,7 +1965,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3170681762742003954, guid: ff6102e6cdba3834ca61198a08bb3460, type: 3}
       propertyPath: m_ProvidesContacts
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4100668941564762822, guid: ff6102e6cdba3834ca61198a08bb3460, type: 3}
       propertyPath: m_AnchorMax.y
@@ -1978,6 +1982,10 @@ PrefabInstance:
     - target: {fileID: 4100668941564762822, guid: ff6102e6cdba3834ca61198a08bb3460, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4495769890538486656, guid: ff6102e6cdba3834ca61198a08bb3460, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 4503844419144503950, guid: ff6102e6cdba3834ca61198a08bb3460, type: 3}
       propertyPath: m_AnchorMax.y
@@ -2985,6 +2993,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1483500169}
     m_Modifications:
+    - target: {fileID: 4392358506202580875, guid: a5a0c0b0414ed12448026f8d9919d19e, type: 3}
+      propertyPath: m_ProvidesContacts
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5872218543640365260, guid: a5a0c0b0414ed12448026f8d9919d19e, type: 3}
       propertyPath: m_Name
       value: AI_Victime (1)
@@ -3483,6 +3495,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1483500169}
     m_Modifications:
+    - target: {fileID: 4392358506202580875, guid: a5a0c0b0414ed12448026f8d9919d19e, type: 3}
+      propertyPath: m_ProvidesContacts
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5872218543640365260, guid: a5a0c0b0414ed12448026f8d9919d19e, type: 3}
       propertyPath: m_Name
       value: AI_Victime

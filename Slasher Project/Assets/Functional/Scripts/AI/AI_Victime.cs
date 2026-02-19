@@ -42,7 +42,7 @@ public class AiVictime : MonoBehaviour, IDamageable
 
     private float hidingSpotRange;
     private bool tryToHide;
-    public GameObject targetedSpot;
+    private GameObject targetedSpot;
     private bool isHidden;
 
     private bool isInterrupted;
@@ -430,11 +430,5 @@ public class AiVictime : MonoBehaviour, IDamageable
     public void Fear()
     {
         talkTimer = talkCooldown;
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawLine(transform.position, targetPos);
     }
 }
