@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering.Universal;
@@ -22,7 +23,7 @@ public class AiVictime : MonoBehaviour
     private Vector2 minMaxDelayBeforeMoving;
     private float delayBeforeFleeing;
     private float maxMoveRange;
-    private float steering;
+    private float fleeRadius;
 
     private float timerBeforeMoving;
     private Vector3 startPos;
@@ -35,9 +36,12 @@ public class AiVictime : MonoBehaviour
     private float damageTimer;
     private bool hasTakenDamage;
 
-    private bool isFleeing;
-    private float fleeRecalculationCooldown = 2f;
-    private float fleeRecalculationTimer;
+    private bool needToSelectAction;
+
+    private float hidingSpotRange;
+    private bool tryToHide;
+    private GameObject targetedSpot;
+    private bool isHidden;
 
     private GameObject player;
 
@@ -84,7 +88,8 @@ public class AiVictime : MonoBehaviour
         moveSpeedRun = fleeData.moveSpeed;
         bravery = Random.Range(fleeData.minMaxBravery.x, fleeData.minMaxBravery.y);
         timeToCombo = fleeData.timeToCombo;
-        steering = fleeData.steering;
+        fleeRadius = fleeData.fleeRadius;
+        hidingSpotRange = fleeData.hidingSpotRange;
     }
 
     private void InitTimers()
@@ -98,7 +103,58 @@ public class AiVictime : MonoBehaviour
     {
         PhaseZeroCheckToMove();
         CheckDeathFromDamage();
-        Flee();
+        
+        ChooseAction();
+        CheckIfDestinationIsReached();
+    }
+
+    private void ChooseAction()
+    {
+        if (!needToSelectAction) return;
+
+        // Courageux = Arme
+        
+        if (Vector3.Distance(player.transform.position, transform.position) <= fleeRadius)
+        {
+            Flee();
+        }
+        else
+        {
+            LookForHidingSpot();
+        }
+        
+        needToSelectAction = false;
+    }
+
+    private void CheckIfDestinationIsReached()
+    {
+        if (!phaseZeroIsEnded) return;
+
+        if (isHidden) return;
+
+        if (Vector3.Distance(transform.position, targetPos) <= 2f)
+        {
+            if (tryToHide)
+            {
+                if (targetedSpot.GetComponent<HidingSpot>().TryHiding())
+                {
+                    Hide();
+                    return;
+                }
+            }
+            
+            needToSelectAction = true;
+        }
+    }
+
+    private void InterruptAction(bool definitive)
+    {
+        if (!phaseZeroIsEnded) return;
+
+        agent.SetDestination(transform.position);
+        tryToHide = false;
+        
+        if (!definitive) needToSelectAction = true;
     }
 
     #region Phase Zero
@@ -196,7 +252,7 @@ public class AiVictime : MonoBehaviour
 
     private void DisableThatScript()
     {
-        enabled = false;
+        Destroy(this);
     }
 
     private void UnsubscribeToEverything()
@@ -206,7 +262,7 @@ public class AiVictime : MonoBehaviour
     
     #endregion
     
-    #region Flee
+    #region Phase Zero Ending
 
     private void StartFleeing()
     {
@@ -227,52 +283,84 @@ public class AiVictime : MonoBehaviour
         agent.enabled = true;
         agent.acceleration = fleeData.acceleration;
         agent.speed = moveSpeedRun;
-        isFleeing = true;
-    }
-
-    private void Flee()
-    {
-        if(!isFleeing) return;
-
-        if (fleeRecalculationTimer > 0)
-        {
-            fleeRecalculationTimer -= Time.deltaTime;
-            return;
-        }
-        
-        fleeRecalculationTimer = fleeRecalculationCooldown;
-        
-        Vector3 awayFromPlayer = (transform.position - player.transform.position).normalized;
-
-        float fleeDistance = 20f;
-        float coneAngle = 360f;
-        int tries = 100;
-
-        float bestDistance = 0;
-
-        Vector3 bestPlaceToFlee = transform.position;
-
-        for (int i = 0; i < tries; i++)
-        {
-            float angle = Random.Range(-coneAngle * 0.5f, coneAngle * 0.5f);
-            Vector3 newDirection = Quaternion.AngleAxis(angle, Vector3.up) * awayFromPlayer;
-
-            Vector3 spotToCheck = transform.position + newDirection * fleeDistance;
-
-            if (NavMesh.SamplePosition(spotToCheck, out NavMeshHit hit, 10f, NavMesh.AllAreas))
-            {
-                float distanceToPlayer = Vector3.Distance(hit.position, player.transform.position);
-                
-                if (distanceToPlayer > bestDistance)
-                {
-                    bestDistance = distanceToPlayer;
-                    bestPlaceToFlee = hit.position;
-                }
-            }
-        }
-        
-        agent.SetDestination(bestPlaceToFlee);
+        needToSelectAction = true;
     }
     
     #endregion
+    
+    #region Flee
+    
+    private void Flee()
+    {
+        Debug.Log("FLEE");
+        var direction = transform.position - player.transform.position;
+        direction.y = 0;
+        var randomDirection = (Quaternion.AngleAxis(Random.Range(-60, 60), Vector3.up) * direction).normalized;
+        if (NavMesh.SamplePosition(transform.position + randomDirection * 10f, out NavMeshHit hit, 10f,
+                NavMesh.AllAreas))
+        {
+            targetPos = hit.position;
+            agent.SetDestination(targetPos);
+        }
+        else
+        {
+            LookForHidingSpot();
+        }
+    }
+    
+    #endregion
+     
+    #region Hide
+
+    private void LookForHidingSpot()
+    {
+        Debug.Log("LOOK FOR HIDING SPOT");
+
+        Collider[] hits = Physics.OverlapSphere(transform.position, hidingSpotRange);
+        List<GameObject> possibleHideSpots = new List<GameObject>();
+
+        foreach (var hit in hits)
+        {
+            if (hit.GetComponent<Collider>().CompareTag("Hiding"))
+            {
+                if(hit.gameObject.GetComponent<HidingSpot>().HasRoom()) possibleHideSpots.Add(hit.gameObject);
+            }
+        }
+
+        if (possibleHideSpots.Count <= 0)
+        {
+            Debug.Log("NO HIDING SPOT");
+            Flee();
+        }
+        else
+        {
+            GoToHidingSpot(possibleHideSpots[Random.Range(0, possibleHideSpots.Count)]);
+        }
+    }
+
+    private void GoToHidingSpot(GameObject hiddenSpot)
+    {
+        if (NavMesh.SamplePosition(hiddenSpot.transform.position, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+        {
+            targetedSpot = hiddenSpot;
+            targetPos = hit.position;
+            agent.SetDestination(targetPos);
+            tryToHide = true;
+            Debug.Log("Hiding Spot Found");
+        }
+    }
+
+    private void Hide()
+    {
+        GetComponent<MeshRenderer>().enabled = false;
+        isHidden = true;
+    }
+    
+    #endregion
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawLine(transform.position, targetPos);
+    }
 }

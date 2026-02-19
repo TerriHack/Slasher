@@ -6,11 +6,14 @@ public class SO_FleeingAgent : ScriptableObject
     [Header("Movement")]
     public float moveSpeed;
     public float acceleration;
-    public float steering;
+    public float fleeRadius;
 
     [Header("Damage")] 
     public float timeToCombo;
 
     [Header("Bravery")] 
     public Vector2Int minMaxBravery;
+
+    [Header("Hiding")] 
+    public float hidingSpotRange;
 }
