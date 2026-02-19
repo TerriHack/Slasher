@@ -10,11 +10,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 27067923311426262, guid: 73a0908173e3577408713caae65e8f3e, type: 3}
       propertyPath: m_Size.y
-      value: -0.68
+      value: -0.94
       objectReference: {fileID: 0}
     - target: {fileID: 27067923311426262, guid: 73a0908173e3577408713caae65e8f3e, type: 3}
       propertyPath: m_Center.y
-      value: 0.75
+      value: 0.47
       objectReference: {fileID: 0}
     - target: {fileID: 3645309650160939393, guid: 73a0908173e3577408713caae65e8f3e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -58,7 +58,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6976654116944122439, guid: 73a0908173e3577408713caae65e8f3e, type: 3}
       propertyPath: m_Name
-      value: P_KnockableTable_00
+      value: P_KnockableTable_03
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:

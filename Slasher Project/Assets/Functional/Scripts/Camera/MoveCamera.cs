@@ -4,22 +4,28 @@ public class MoveCamera : MonoBehaviour
 {
     private Camera cam;
     [HideInInspector] public Vector2Int dimensions;
+    
+    private PlayerController player;
 
+    private bool _transitionStarted;
+    private float  _transitionCountdown;
+    
     void Start()
     {
         cam = Camera.main;
+        player = PlayerController.Instance;
     }
 
     void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
 
-        MoveCam(other.transform.position);
+        MoveCam();
     }
 
-    private void MoveCam(Vector3 playerPos)
+    private void MoveCam()
     {
-        var direction = transform.position - playerPos;
+        var direction = transform.position - player.transform.position;
 
         direction.y = 0;
         if (Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
@@ -34,5 +40,10 @@ public class MoveCamera : MonoBehaviour
         }
 
         cam.transform.position += direction; // Pour Terri, à toi de Lerp ou de faire un truc stylé
+    }
+
+    private void TransitionCooldown()
+    {
+        
     }
 }

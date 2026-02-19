@@ -74,6 +74,14 @@ PrefabInstance:
       propertyPath: m_Size.x
       value: 1.9
       objectReference: {fileID: 0}
+    - target: {fileID: 27067923311426262, guid: 73a0908173e3577408713caae65e8f3e, type: 3}
+      propertyPath: m_Size.y
+      value: 1.98
+      objectReference: {fileID: 0}
+    - target: {fileID: 27067923311426262, guid: 73a0908173e3577408713caae65e8f3e, type: 3}
+      propertyPath: m_Center.y
+      value: 1.04
+      objectReference: {fileID: 0}
     - target: {fileID: 3645309650160939393, guid: 73a0908173e3577408713caae65e8f3e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -116,7 +124,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6976654116944122439, guid: 73a0908173e3577408713caae65e8f3e, type: 3}
       propertyPath: m_Name
-      value: P_KnockableSofa_00
+      value: P_KnockableSofa_01
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
