@@ -139,10 +139,10 @@ public class PlayerController : MonoBehaviour
     }
     private void CharacterRotation()
     {
-        // float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, MathF.Atan2(_lastMoveDir.x, _lastMoveDir.y) * Mathf.Rad2Deg,ref r, 0.1f);
-        // transform.rotation = Quaternion.Euler(0, angle, 0);
+        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, MathF.Atan2(_lastMoveDir.x, _lastMoveDir.y) * Mathf.Rad2Deg,ref r, 0.1f);
+        transform.rotation = Quaternion.Euler(0, angle, 0);
         
-        transform.eulerAngles = new Vector3(transform.eulerAngles.x, MathF.Atan2(_lastMoveDir.x, _lastMoveDir.y) * Mathf.Rad2Deg, transform.eulerAngles.z);
+        //transform.eulerAngles = new Vector3(transform.eulerAngles.x, MathF.Atan2(_lastMoveDir.x, _lastMoveDir.y) * Mathf.Rad2Deg, transform.eulerAngles.z);
     }
     
     
