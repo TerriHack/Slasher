@@ -13,7 +13,9 @@ public class AiVictime : MonoBehaviour, IDamageable
     [SerializeField] private SO_PhaseZeroAgent baseData;
     [SerializeField] private SO_FleeingAgent fleeData;
     [SerializeField] private ParticleSystem bloodVFX;
-    [SerializeField] private Animator animator;
+    [SerializeField] private GameObject[] characters;
+    
+    private Animator _currentAnimator;
 
     private NavMeshAgent agent;
 
@@ -66,6 +68,7 @@ public class AiVictime : MonoBehaviour, IDamageable
     #region Init
     private void Start()
     {
+        InitCharacterVisuals();
         InitBaseData();
         InitFleeData();
         InitTimers();
@@ -79,6 +82,24 @@ public class AiVictime : MonoBehaviour, IDamageable
         GameManager.Instance.startFleeingPhase += StartFleeing;
     }
 
+    private void InitCharacterVisuals()
+    {
+        int selectedIndex = Random.Range(0, characters.Length);
+
+        for (int i = 0; i < characters.Length; i++)
+        {
+            if (i != selectedIndex)
+            {
+                characters[i].SetActive(false);
+            }
+            else
+            {
+                characters[i].SetActive(true);
+                _currentAnimator = characters[i].GetComponent<Animator>();
+            }
+        }
+    }
+    
     private void InitBaseData()
     {
         if (baseData == null)
@@ -144,11 +165,11 @@ public class AiVictime : MonoBehaviour, IDamageable
     {
         if (agent.velocity.magnitude > 0.2f)
         {
-            animator.SetBool("isMoving",true);
+            _currentAnimator.SetBool("isMoving",true);
         }
         else
         {
-            animator.SetBool("isMoving",false);
+            _currentAnimator.SetBool("isMoving",false);
         }
     }
 
@@ -358,7 +379,7 @@ public class AiVictime : MonoBehaviour, IDamageable
         blood.GetComponent<DecalProjector>().size = Random.Range(0.8f, 4f) * Vector3.one;
         blood.transform.RotateAround(Vector3.up, Random.Range(0, 360));
         
-        animator.enabled = false;
+        _currentAnimator.enabled = false;
     }
 
     private void DisableThatScript()
@@ -377,7 +398,7 @@ public class AiVictime : MonoBehaviour, IDamageable
 
     private void StartFleeing()
     {
-        animator.SetBool("isTerrified", true);
+        _currentAnimator.SetBool("isTerrified", true);
         
         phaseZeroIsEnded = true;
         agent.enabled = false;
@@ -406,8 +427,8 @@ public class AiVictime : MonoBehaviour, IDamageable
     private void Flee()
     {
         Debug.Log("FLEE");
-        animator.SetBool("isTerrified", false);
-        animator.SetBool("isRunning", true);
+        _currentAnimator.SetBool("isTerrified", false);
+        _currentAnimator.SetBool("isRunning", true);
         var direction = transform.position - player.transform.position;
         direction.y = 0;
         var randomDirection = (Quaternion.AngleAxis(Random.Range(-60, 60), Vector3.up) * direction).normalized;

@@ -26,16 +26,17 @@ public class CameraController : MonoBehaviour
         CameraTransition();
     }
 
-    public void StartCameraTransition(Vector3 previousPosition, Vector3 targetPosition)
+    public void StartCameraTransition(Vector3 targetPosition)
     {
         if (_transitionStarted)
         {
             ResetTransition();
-            _currentTargetPosition = PreviousPosition + targetPosition;
+            _currentTargetPosition = PreviousPosition;
+            _transitionStarted = true;
             return;
         }
         _currentTargetPosition = targetPosition;
-        PreviousPosition =  previousPosition;
+        PreviousPosition =  transform.position;
         _transitionStarted = true;
     }
 
@@ -49,7 +50,7 @@ public class CameraController : MonoBehaviour
     {
         _transitionCountdown = 0f;
         _transitionStarted = false;
-        PreviousPosition = _currentTargetPosition;
+        PreviousPosition = transform.position;
     }
     
     private void CameraTransitionCountdown()
