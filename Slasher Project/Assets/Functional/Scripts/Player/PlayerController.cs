@@ -91,7 +91,7 @@ public class PlayerController : MonoBehaviour
         if (currentPlayerState == PlayerState.NoControl) return;
         
         //EXECUTE DEFAULT CONTROLLER
-        transform.position += GetMovement() + GetSprint();
+        transform.position += (GetMovement() + GetSprint()) * GetWallCollision();
         
         GetLastDirection();
         CharacterRotation();
@@ -139,7 +139,7 @@ public class PlayerController : MonoBehaviour
     }
     private void CharacterRotation()
     {
-        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, MathF.Atan2(_lastMoveDir.x, _lastMoveDir.y) * Mathf.Rad2Deg,ref r, 0.2f);
+        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, MathF.Atan2(_lastMoveDir.x, _lastMoveDir.y) * Mathf.Rad2Deg,ref r, 0.1f);
         transform.rotation = Quaternion.Euler(0, angle, 0);
     }
     
@@ -151,13 +151,6 @@ public class PlayerController : MonoBehaviour
         if (_inputHandler.MoveInput != Vector2.zero) _lastMoveDir = _inputHandler.MoveInput;
         
         Vector3 movement = new Vector3(_lastMoveDir.x, 0, _lastMoveDir.y);
-
-        if (IsCollidingWithWall())
-        {
-            onStopWalking.Invoke();
-            return movement * _moveSo.DecelerationCurve.Evaluate(_movementValue);
-            
-        }
         
         if (_isMoving)
         {
@@ -170,16 +163,16 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private bool IsCollidingWithWall()
+    private int GetWallCollision()
     {
         RaycastHit raycastHit;
         
-        Debug.DrawRay(transform.localPosition, Vector3.forward*3, Color.red);
-        if (Physics.Raycast(transform.localPosition, Vector3.forward * 3, out raycastHit))
+        Debug.DrawRay(transform.position, transform.forward*2, Color.red);
+        if (Physics.Raycast(transform.position, transform.forward, out raycastHit, 2f))
         {
-            if (raycastHit.collider.tag == "Wall") return true;
+            if (raycastHit.collider.tag == "Wall") return 0;
         }
-        return false;
+        return 1;
     }
     private void MovementValueCalculation()
     {
