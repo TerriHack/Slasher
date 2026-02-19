@@ -41,7 +41,7 @@ public class PostProcessManager : MonoBehaviour
     
     public void OnKill()
     {
-        volume.weight = 1;
+        volume.weight = .5f;
         isInKillMode = true;
         onKillTimer = onKillDuration;
         

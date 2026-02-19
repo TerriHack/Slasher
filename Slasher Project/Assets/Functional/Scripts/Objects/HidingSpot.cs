@@ -34,6 +34,7 @@ public class HidingSpot : MonoBehaviour, IDamageable
             var ai = aiInIt[i];
             ai.transform.position =  transform.position + (Vector3)Random.insideUnitCircle * 5f;
             ai.GetComponent<AiVictime>().LeaveHidingSpot();
+            aiInIt.RemoveAt(i);
         }
         
         Destroy(gameObject);
