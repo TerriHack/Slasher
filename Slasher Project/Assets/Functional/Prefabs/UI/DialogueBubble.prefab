@@ -287,7 +287,12 @@ MonoBehaviour:
   - Heu... bonjour ?
   fleeDialogues: []
   attackDialogues: []
-  isHeGoneDialogues: []
+  isHeGoneDialogues:
+  - Vous pensez qu'il est parti ?
+  - "Je crois qu'on est en s\xE9curit\xE9..."
+  - Chut, ne faites pas de bruit !
+  - Vous entendez quelque chose ?
+  - "A\xEFe, mon pied !"
 --- !u!111 &-3912537549279613802
 Animation:
   m_ObjectHideFlags: 0

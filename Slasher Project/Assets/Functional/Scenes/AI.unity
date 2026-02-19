@@ -704,7 +704,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e82125f54529ae148b10c3419f5fbf67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HidingSpot
-  maxCapacity: 2
+  maxCapacity: 5
 --- !u!4 &477297475 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7090241632496894407, guid: a5a0c0b0414ed12448026f8d9919d19e, type: 3}

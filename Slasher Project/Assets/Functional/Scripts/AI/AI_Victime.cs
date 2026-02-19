@@ -8,6 +8,8 @@ using Random = UnityEngine.Random;
 
 public class AiVictime : MonoBehaviour, IDamageable
 {
+    #region Variables
+    
     [SerializeField] private SO_PhaseZeroAgent baseData;
     [SerializeField] private SO_FleeingAgent fleeData;
     [SerializeField] private ParticleSystem bloodVFX;
@@ -48,6 +50,8 @@ public class AiVictime : MonoBehaviour, IDamageable
     private GameObject player;
 
     [SerializeField] private GameObject bloodSplatter;
+    
+    #endregion
     
     #region Init
     private void Start()
@@ -103,11 +107,15 @@ public class AiVictime : MonoBehaviour, IDamageable
 
     private void Update()
     {
+        DecreaseTalkTimer();
+        
         PhaseZeroCheckToMove();
         CheckDeathFromDamage();
         
         ChooseAction();
         CheckIfDestinationIsReached();
+
+        CheckForIsHeGoneVoiceline();
     }
 
     private void ChooseAction()
@@ -116,6 +124,8 @@ public class AiVictime : MonoBehaviour, IDamageable
 
         if (isInterrupted) return;
 
+        talkTimer = talkCooldown;
+        
         // Courageux = Arme
         
         if (Vector3.Distance(player.transform.position, transform.position) <= fleeRadius)
@@ -140,6 +150,13 @@ public class AiVictime : MonoBehaviour, IDamageable
         {
             if (tryToHide)
             {
+                if (targetedSpot == null)
+                {
+                    tryToHide = false;
+                    needToSelectAction = true;
+                    return;
+                }
+                
                 if (targetedSpot.GetComponent<HidingSpot>().TryHiding(gameObject))
                 {
                     Hide();
@@ -384,6 +401,35 @@ public class AiVictime : MonoBehaviour, IDamageable
     {
         targetPos = pos;
         agent.SetDestination(targetPos);
+    }
+
+    private void CheckForIsHeGoneVoiceline()
+    {
+        if (!isHidden) return;
+      
+        if (talkTimer > 0) return;
+
+        if (Random.Range(0, 100) > talkProbability)
+        {
+            talkTimer = talkCooldown;
+            return;
+        }
+        
+        if (DialogueManager.Instance.SpawnDialogueBubble(gameObject, 3))
+        {
+            talkTimer = talkCooldown;
+            Debug.Log("TALK");
+        }
+    }
+
+    private void DecreaseTalkTimer()
+    {
+        if(!phaseZeroIsEnded || isHidden) talkTimer -= Time.deltaTime;
+    }
+
+    public void Fear()
+    {
+        talkTimer = talkCooldown;
     }
 
     private void OnDrawGizmos()
