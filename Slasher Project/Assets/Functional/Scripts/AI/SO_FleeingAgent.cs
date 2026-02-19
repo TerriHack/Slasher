@@ -3,6 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "SO_FleeingAgent", menuName = "Scriptable Objects/SO_FleeingAgent")]
 public class SO_FleeingAgent : ScriptableObject
 {
+    
     [Header("Movement")]
     public float moveSpeed;
     public float acceleration;
@@ -24,4 +25,5 @@ public class SO_FleeingAgent : ScriptableObject
     [Header("Weapon")] 
     public float weaponSearchRange;
     public float delayBeforeShooting;
+    public float maxShootingRange;
 }
