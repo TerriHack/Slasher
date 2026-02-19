@@ -46,14 +46,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueManager
   canvas: {fileID: 8588613182795168854}
-  dialogueBubble: {fileID: 7094293645462101044, guid: aae1cae59c48cad4dac7b353a970014e, type: 3}
-  bubbleDuration: 5
-  bubbleCooldown: 8
-  bubbleSprites: []
-  phaseZeroDialogues: []
-  fleeDialogues: []
-  attackDialogues: []
-  isHeGoneDialogues: []
+  bubbleDuration: 2
+  dialogueBubble: {fileID: 7094293645462101044, guid: ede56539f0e86944d980dd25f2e00301, type: 3}
+  dialogueBubbleCooldown: 8
+  shockedBubble: {fileID: 7094293645462101044, guid: aae1cae59c48cad4dac7b353a970014e, type: 3}
 --- !u!1 &5457691177984356439
 GameObject:
   m_ObjectHideFlags: 0

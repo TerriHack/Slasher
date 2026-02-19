@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7141261648174518941}
   - component: {fileID: 9169235302856198152}
   - component: {fileID: 5210026088150935005}
+  - component: {fileID: 8885822028292532016}
   m_Layer: 0
   m_Name: P_GameManager
   m_TagString: Untagged
@@ -98,3 +99,15 @@ MonoBehaviour:
   kickDebugImage: {fileID: 0}
   sprintValueText: {fileID: 0}
   stabValueText: {fileID: 0}
+--- !u!114 &8885822028292532016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2481465866989827343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1a78ee9290cfe746ac304c2177605b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager

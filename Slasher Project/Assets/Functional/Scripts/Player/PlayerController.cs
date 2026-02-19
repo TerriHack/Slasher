@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerPresetSo playerPresetSo;
     [SerializeField] private Transform collisionBoxParent;
     [SerializeField] private Animator animator;
+    [SerializeField] private AnimationCurve rotationSpeed;
 
     [field: SerializeField, ReadOnly, BoxGroup("Player Actions")]
     private bool _canMove;
@@ -64,6 +65,8 @@ public class PlayerController : MonoBehaviour
 
     private bool _isSprinting;
     private float _sprintValue;
+
+    private float r; 
     
     private void Awake()
     {
@@ -136,7 +139,8 @@ public class PlayerController : MonoBehaviour
     }
     private void CharacterRotation()
     {
-        transform.eulerAngles = new Vector3(transform.eulerAngles.x, MathF.Atan2(_lastMoveDir.x, _lastMoveDir.y) * Mathf.Rad2Deg, transform.eulerAngles.z);
+        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, MathF.Atan2(_lastMoveDir.x, _lastMoveDir.y) * Mathf.Rad2Deg,ref r, 0.1f);
+        transform.rotation = Quaternion.Euler(0, angle, 0);
     }
     
     private Vector3 GetMovement()

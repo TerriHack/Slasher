@@ -9,6 +9,7 @@ public class AiVictime : MonoBehaviour
 {
     [SerializeField] private SO_PhaseZeroAgent baseData;
     [SerializeField] private SO_FleeingAgent fleeData;
+    [SerializeField] private ParticleSystem bloodVFX;
 
     private NavMeshAgent agent;
 
@@ -160,6 +161,7 @@ public class AiVictime : MonoBehaviour
     {
         damageTimer = timeToCombo;
         hasTakenDamage = true;
+        bloodVFX.Play();
     }
 
     private void CheckDeathFromDamage()
@@ -273,12 +275,4 @@ public class AiVictime : MonoBehaviour
     }
     
     #endregion
-
-    private void OnCollisionEnter(Collision other)
-    {
-        if (other.gameObject.CompareTag("Player"))
-        {
-            TakeDamage();
-        }
-    }
 }

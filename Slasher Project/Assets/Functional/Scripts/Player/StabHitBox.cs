@@ -10,5 +10,12 @@ public class StabHitBox : MonoBehaviour
             victimeTouched = other.GetComponent<AiVictime>();
             victimeTouched.TakeDamage();
         }
+
+        KnockableObject touchedObject;
+        if (other.GetComponent<KnockableObject>() != null)
+        {
+            touchedObject = other.GetComponent<KnockableObject>();
+            touchedObject.Eject(PlayerController.Instance.transform.position);
+        }
     }
 }

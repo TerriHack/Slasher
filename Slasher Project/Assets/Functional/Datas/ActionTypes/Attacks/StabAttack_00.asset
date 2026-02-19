@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StabAttackSo
   <AttackDuration>k__BackingField: 0.4
   <AttackDamages>k__BackingField: 5
+  <SlashRotation>k__BackingField: {x: -58.4, y: 90, z: 116}
   <AttackAnimatorOverride>k__BackingField: {fileID: 22100000, guid: a110afdfc5f64c146bd4911350b36ba3, type: 2}
   collisionBox: {fileID: 7365490540618491492, guid: 768bbe673d1f4054899bd8bc54cec66d, type: 3}
