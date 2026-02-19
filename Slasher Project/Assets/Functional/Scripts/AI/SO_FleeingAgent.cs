@@ -19,6 +19,7 @@ public class SO_FleeingAgent : ScriptableObject
 
     [Header("Hiding")] 
     public float hidingSpotRange;
+    public float maxBraveryToHide;
 
     [Header("Weapon")] 
     public float weaponSearchRange;

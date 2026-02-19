@@ -47,6 +47,7 @@ public class AiVictime : MonoBehaviour, IDamageable
     private bool isHidden;
     private float regainBraverySpeed;
     private float minimumBraveryForWeapon;
+    private float maxBraveryToHide;
 
     private bool isInterrupted;
 
@@ -111,6 +112,7 @@ public class AiVictime : MonoBehaviour, IDamageable
         minimumBraveryForWeapon = fleeData.minimumBraveryForWeapon;
         weaponSearchRange = fleeData.weaponSearchRange;
         delayBeforeShooting = fleeData.delayBeforeShooting;
+        maxBraveryToHide = fleeData.maxBraveryToHide;
     }
 
     private void InitTimers()
@@ -152,7 +154,7 @@ public class AiVictime : MonoBehaviour, IDamageable
         {
             GoLookForAWeapon();
         }
-        else if (Vector3.Distance(player.transform.position, transform.position) > fleeRadius)
+        else if (Vector3.Distance(player.transform.position, transform.position) > fleeRadius && bravery <= maxBraveryToHide)
         {
             LookForHidingSpot();
         }
@@ -174,6 +176,8 @@ public class AiVictime : MonoBehaviour, IDamageable
         {
             if (selectedWeapon != null)
             {
+                Debug.LogFormat("<color=yellow> Reached Destination {0}, current position {1}", targetPos, transform.position);
+                
                 selectedWeapon.PickWeapon();
                 BecomeShooter();
             }
@@ -205,6 +209,7 @@ public class AiVictime : MonoBehaviour, IDamageable
         MoveTo(transform.position);
         
         tryToHide = false;
+        selectedWeapon = null;
 
         if (!definitive)
         {
@@ -277,6 +282,7 @@ public class AiVictime : MonoBehaviour, IDamageable
         hasTakenDamage = true;
         bloodVFX.Play();
         PostProcessManager.Instance.OnKill();
+        InterruptAction(true);
         ScareOthers();
     }
 
@@ -510,6 +516,11 @@ public class AiVictime : MonoBehaviour, IDamageable
         if(!isHidden) return;
 
         bravery += Time.deltaTime * regainBraverySpeed;
+
+        if (bravery > maxBraveryToHide)
+        {
+            LeaveHidingSpot();
+        }
     }
     
     #endregion
@@ -521,7 +532,6 @@ public class AiVictime : MonoBehaviour, IDamageable
         Debug.Log("Go look for a weapon");
         
         Collider[] hits = Physics.OverlapSphere(transform.position, weaponSearchRange);
-        List<GameObject> possibleWeapons = new List<GameObject>();
 
         if (hits.Length <= 0)
         {
@@ -534,22 +544,19 @@ public class AiVictime : MonoBehaviour, IDamageable
             if (hit.GetComponent<Collider>().CompareTag("Weapon"))
             {
                 Weapon script = hit.gameObject.GetComponent<Weapon>();
-                
-                if(script.IsSelected()) possibleWeapons.Add(hit.gameObject);
+
+                if (script.IsSelected()) continue;
                 script.SelectThisWeapon();
                 selectedWeapon = script;
                 MoveTo(hit.transform.position);
                 
                 Debug.Log("<color=yellow>Arme trouvée, déplacement vers " + script.transform.position);
-                
-                break;
+
+                return;
             }
         }
-
-        if (possibleWeapons.Count <= 0)
-        {
-            Flee();
-        }
+        
+        Flee();
     }
     
     private void BecomeShooter()

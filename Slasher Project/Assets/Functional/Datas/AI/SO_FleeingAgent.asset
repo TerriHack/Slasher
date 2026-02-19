@@ -21,5 +21,6 @@ MonoBehaviour:
   regainBraverySpeed: 10
   minimumBraveryForWeapon: 60
   hidingSpotRange: 50
+  maxBraveryToHide: 60
   weaponSearchRange: 50
   delayBeforeShooting: 3
