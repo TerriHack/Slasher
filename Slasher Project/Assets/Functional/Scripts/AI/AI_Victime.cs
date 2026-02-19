@@ -54,8 +54,11 @@ public class AiVictime : MonoBehaviour, IDamageable
 
     private float weaponSearchRange;
     private float delayBeforeShooting;
+    private float delayBeforeShootingTimer;
     private Weapon selectedWeapon;
     private bool isShooter;
+    private float maxShootingRange;
+    private bool isAiming;
     
     private GameObject player;
 
@@ -114,11 +117,13 @@ public class AiVictime : MonoBehaviour, IDamageable
         weaponSearchRange = fleeData.weaponSearchRange;
         delayBeforeShooting = fleeData.delayBeforeShooting;
         maxBraveryToHide = fleeData.maxBraveryToHide;
+        maxShootingRange = fleeData.maxShootingRange;
     }
 
     private void InitTimers()
     {
         timerBeforeMoving = Random.Range(minMaxDelayBeforeMoving.x, minMaxDelayBeforeMoving.y);
+        delayBeforeShootingTimer = delayBeforeShooting;
     }
     
     #endregion
@@ -138,6 +143,8 @@ public class AiVictime : MonoBehaviour, IDamageable
         RegainBravery();
         
         MoveAnim();
+        
+        Aim();
     }
 
     private void MoveAnim()
@@ -162,7 +169,22 @@ public class AiVictime : MonoBehaviour, IDamageable
 
         if (isShooter)
         {
-            return;
+            if (isAiming)
+            {
+                transform.LookAt(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z));
+                return;
+            }
+            if (Vector3.Distance(transform.position, player.transform.position) < maxShootingRange)
+            {
+                isAiming = true;
+                return;
+            }
+            else
+            {
+                transform.LookAt(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z));
+                needToSelectAction = true;
+                return;
+            }
         }
 
         if (bravery >= minimumBraveryForWeapon)
@@ -551,8 +573,6 @@ public class AiVictime : MonoBehaviour, IDamageable
 
     private void GoLookForAWeapon()
     {
-        Debug.Log("Go look for a weapon");
-        
         Collider[] hits = Physics.OverlapSphere(transform.position, weaponSearchRange);
 
         if (hits.Length <= 0)
@@ -571,8 +591,6 @@ public class AiVictime : MonoBehaviour, IDamageable
                 script.SelectThisWeapon();
                 selectedWeapon = script;
                 MoveTo(hit.transform.position);
-                
-                Debug.Log("<color=yellow>Arme trouvée, déplacement vers " + script.transform.position);
 
                 return;
             }
@@ -587,6 +605,27 @@ public class AiVictime : MonoBehaviour, IDamageable
         isShooter = true;
         var mat = GetComponent<MeshRenderer>().material;
         mat.color = Color.blue;
+    }
+
+    private void Aim()
+    {
+        if (!isAiming) return;
+
+        needToSelectAction = false;
+        
+        delayBeforeShootingTimer -= Time.deltaTime;
+        if (delayBeforeShootingTimer <= 0 &&
+            Vector3.Distance(transform.position, player.transform.position) < maxShootingRange)
+        {
+            Shoot();
+        }
+    }
+
+    private void Shoot()
+    {
+        Debug.Log("SHOOT");
+        delayBeforeShootingTimer = delayBeforeShooting + 2f;
+        needToSelectAction = true;
     }
     
     #endregion
